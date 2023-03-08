@@ -4,16 +4,16 @@
 #include <cstdio>
 
 /// Output image resolution
-static const int imageWidth = 1920;
-static const int imageHeight = 1080;
+static const int imageWidth = 1270;
+static const int imageHeight = 720;
 
 static const int maxColorComponent = 255;
 
 static const int widthCenter = imageWidth / 2;
 static const int heightCenter = imageHeight / 2;
 static const int radiusRedCircle = heightCenter / 2;
-static const int radiusWhiteCircle = heightCenter / 3 + 5;
-static const int radiusSmallRedCircle = heightCenter / 3 + 10;
+static const int radiusWhiteCircle = heightCenter / 3 + heightCenter / 108;
+static const int radiusSmallRedCircle = heightCenter / 3 + heightCenter / 54;
 
 union Color {
 	struct { unsigned char r, g, b; };
@@ -29,7 +29,7 @@ const char* generateCoordinateColorTask2(int rowIdx, int colIdx) {
 	if (x * x + y * y <= radiusRedCircle * radiusRedCircle + 1 && x * x + y * y > radiusWhiteCircle * radiusWhiteCircle + 1) {
 		sprintf_s(buff2, "%d %d %d", 255, 0, 0);
 	} else {
-		if ((x + 80) * (x + 80) + y * y <= radiusSmallRedCircle * radiusSmallRedCircle + 1) {
+		if ((x + heightCenter / 7) * (x + heightCenter / 7) + y * y <= radiusSmallRedCircle * radiusSmallRedCircle + 1) {
 			sprintf_s(buff2, "%d %d %d", 255, 0, 0);
 		} else {
 			sprintf_s(buff2, "%d %d %d", 232, 228, 201);
@@ -54,7 +54,7 @@ void writeFileTask2() {
 	ppmFileStream.close();
 }
 
-int main2() {
+int main() {
 	writeFileTask2();
 	return 0;
 }
