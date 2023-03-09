@@ -24,7 +24,6 @@ Color matrix[numberOfRecPerRow * numberOfRecPerColumn];
 
 char buff[24]{};
 const char* generateCoordinateColorTask1(int rowIdx, int colIdx) {
-	memset(buff, 0, sizeof(char));
 	const int numRectRow = rowIdx / verticalJump;
 	const int numRectCol = colIdx / horizontalJump;
 	const int idx = numRectRow * numberOfRecPerRow + numRectCol;
