@@ -7,7 +7,7 @@
 static const int imageWidth = 1280;
 static const int imageHeight = 720;
 
-static const float aspectRatio = imageWidth / imageHeight;
+static const float aspectRatio = (float)imageWidth / (float)imageHeight;
 
 static const int maxColorComponent = 255;
 
@@ -64,7 +64,7 @@ const char* generateCoordinateColorTask(int rowIdx, int colIdx) {
 	Color col{};
 	col.r = rayDir.x >= 0 ? rayDir.x * maxColorComponent : (rayDir.x * -1) * maxColorComponent;
 	col.g = rayDir.y >= 0 ? rayDir.y * maxColorComponent : (rayDir.y * -1) * maxColorComponent;
-	col.b = rayDir.z >= 0 ? rayDir.z * maxColorComponent : (rayDir.z * -1) * maxColorComponent;
+	//col.b = rayDir.z >= 0 ? rayDir.z * maxColorComponent : (rayDir.z * -1) * maxColorComponent;
 	sprintf_s(buff, "%d %d %d", col.r, col.g, col.b);
 	return buff;
 }
