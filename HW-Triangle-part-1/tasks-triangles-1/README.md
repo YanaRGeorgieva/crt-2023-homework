@@ -1,0 +1,1 @@
+* CRT Triangles 1 HW Link: https://docs.google.com/document/d/1YWOirEN3X5cExwwZEo_MHdj03o1Eh2o5v-uQ_2-wlf0/edit
