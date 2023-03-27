@@ -2,18 +2,18 @@
 #include <cstdlib>
 #include <cstdio>
 
-struct Vector {
+struct CRTVector {
 	float x, y, z;
 
-	Vector(float x, float y, float z) : x(x), y(y), z(z) {}
+	CRTVector(float x, float y, float z) : x(x), y(y), z(z) {}
 
 	float length() const {
 		return sqrtf((x * x) + (y * y) + (z * z));
 	}
 
-	Vector normalize() const {
-		float length = this->length();
-		return Vector{ x / length, y / length, z / length };
+	CRTVector normalize() const {
+		float multiplier = 1.0f / this->length();
+		return CRTVector{ x * multiplier, y * multiplier, z * multiplier };
 	}
 
 	void setComponents(float x, float y, float z) {
@@ -22,28 +22,28 @@ struct Vector {
 		this->z = z;
 	}
 
-	Vector operator+ (const Vector& lhs) const {
-		return Vector{ x + lhs.x, y + lhs.y, z + lhs.z };
+	CRTVector operator+ (const CRTVector& lhs) const {
+		return CRTVector{ x + lhs.x, y + lhs.y, z + lhs.z };
 	}
 
-	Vector operator- (const Vector& lhs) const {
-		return Vector{ x - lhs.x, y - lhs.y, z - lhs.z };
+	CRTVector operator- (const CRTVector& lhs) const {
+		return CRTVector{ x - lhs.x, y - lhs.y, z - lhs.z };
 	}
 
-	Vector operator* (const int scalar) const {
-		return Vector{ x * scalar, y * scalar,z * scalar };
+	CRTVector operator* (const int scalar) const {
+		return CRTVector{ x * scalar, y * scalar, z * scalar };
 	}
 
-	Vector operator* (const float scalar) const {
-		return Vector{ x * scalar, y * scalar,z * scalar };
+	CRTVector operator* (const float scalar) const {
+		return CRTVector{ x * scalar, y * scalar, z * scalar };
 	}
 
-	Vector operator* (const double scalar) const {
-		return Vector{ x * (float)scalar, y * (float)scalar,z * (float)scalar };
+	CRTVector operator* (const double scalar) const {
+		return CRTVector{ x * (float)scalar, y * (float)scalar, z * (float)scalar };
 	}
 
-	Vector cross(const Vector& rhs) {
-		return Vector{
+	CRTVector cross(const CRTVector& rhs) {
+		return CRTVector{
 			y * rhs.z - z * rhs.y,
 			z * rhs.x - x * rhs.z,
 			x * rhs.y - y * rhs.x
@@ -52,17 +52,17 @@ struct Vector {
 };
 
 const int numberOFVertices = 3;
-struct Triangle {
+struct CRTTriangle {
 	union {
-		Vector verticesArr[numberOFVertices];
-		struct { Vector v0, v1, v2; };
+		CRTVector verticesArr[numberOFVertices];
+		struct { CRTVector v0, v1, v2; };
 	};
 
-	Triangle(const Vector& x, const Vector& y, const Vector& z) :v0(x), v1(y), v2(z) {}
+	CRTTriangle(const CRTVector& x, const CRTVector& y, const CRTVector& z) :v0(x), v1(y), v2(z) {}
 
-	Vector getNormalVector() const {
-		Vector e0 = v0 - v1;
-		Vector e1 = v2 - v1;
+	CRTVector getNormalVector() const {
+		CRTVector e0 = v0 - v1;
+		CRTVector e1 = v2 - v1;
 		return e0.cross(e1).normalize();
 	}
 
@@ -77,8 +77,8 @@ struct Triangle {
 		// Heron formula
 		return sqrtf(s * (s - vs1) * (s - vs0) * (s - vs2));*/
 		// or use that area of the triangle is 1/2 of area of the parallelogram formed  by e0 and e1
-		Vector e0 = v0 - v1;
-		Vector e1 = v2 - v1;
+		CRTVector e0 = v0 - v1;
+		CRTVector e1 = v2 - v1;
 		return e0.cross(e1).length() / 2;
 	}
 };
@@ -97,33 +97,33 @@ int main()
 		trangle v0=Vector(0.56, 1.11, 1.23), v1=Vector(0.44, -2.368, -0.54), v2=Vector(-1.56, 0.15, -1.92): normal vector (-0.75642, -0.275748, 0.59312) and area 6.11862
 	*/
 
-	// Изчислете векторното произведение(AxB) между двата вектора А = (3.5, 0, 0) и B = (1.75, 3.5, 0)
-	Vector A(3, -3, 1);
-	Vector B(1.75, 3.5, 0);
-	Vector crossAB(A.cross(B));
+	// РР·С‡РёСЃР»РµС‚Рµ РІРµРєС‚РѕСЂРЅРѕС‚Рѕ РїСЂРѕРёР·РІРµРґРµРЅРёРµ(AxB) РјРµР¶РґСѓ РґРІР°С‚Р° РІРµРєС‚РѕСЂР° Рђ = (3.5, 0, 0) Рё B = (1.75, 3.5, 0)
+	CRTVector A(3, -3, 1);
+	CRTVector B(1.75, 3.5, 0);
+	CRTVector crossAB(A.cross(B));
 	printf("A(%g, %g, %g) x B(%g, %g, %g) = (%g, %g, %g)\n", A.x, A.y, A.z, B.x, B.y, B.z, crossAB.x, crossAB.y, crossAB.z);
 
-	// Изчислете векторното произведение(AxB) между двата вектора А = (3, -3, 1) и B = (4, 9, 3)
+	// РР·С‡РёСЃР»РµС‚Рµ РІРµРєС‚РѕСЂРЅРѕС‚Рѕ РїСЂРѕРёР·РІРµРґРµРЅРёРµ(AxB) РјРµР¶РґСѓ РґРІР°С‚Р° РІРµРєС‚РѕСЂР° Рђ = (3, -3, 1) Рё B = (4, 9, 3)
 	B.setComponents(4, 9, 3);
 	crossAB = A.cross(B);
 	printf("A(%g, %g, %g) x B(%g, %g, %g) = (%g, %g, %g)\n", A.x, A.y, A.z, B.x, B.y, B.z, crossAB.x, crossAB.y, crossAB.z);
 
-	// Изчислете лицето на успоредника, който се формира с векторите А = (3, -3, 1) и B = (4, 9, 3)
+	// РР·С‡РёСЃР»РµС‚Рµ Р»РёС†РµС‚Рѕ РЅР° СѓСЃРїРѕСЂРµРґРЅРёРєР°, РєРѕР№С‚Рѕ СЃРµ С„РѕСЂРјРёСЂР° СЃ РІРµРєС‚РѕСЂРёС‚Рµ Рђ = (3, -3, 1) Рё B = (4, 9, 3)
 	B.setComponents(4, 9, 3);
 	printf("area(parallelogram(A(%g, %g, %g), B(%g, %g, %g))) = length(AxB) = %g\n", A.x, A.y, A.z, B.x, B.y, B.z, A.cross(B).length());
 
-	// Изчислете лицето на успоредника, който се формира с векторите А = (3, -3, 1) и B = (4, 9, 3)
+	// РР·С‡РёСЃР»РµС‚Рµ Р»РёС†РµС‚Рѕ РЅР° СѓСЃРїРѕСЂРµРґРЅРёРєР°, РєРѕР№С‚Рѕ СЃРµ С„РѕСЂРјРёСЂР° СЃ РІРµРєС‚РѕСЂРёС‚Рµ Рђ = (3, -3, 1) Рё B = (-12, 12, -4)
 	B.setComponents(-12, 12, -4);
 	printf("area(parallelogram(A(%g, %g, %g), B(%g, %g, %g))) = length(AxB) = %g\n", A.x, A.y, A.z, B.x, B.y, B.z, A.cross(B).length());
 
 	/*
-		Намерете нормал вектор за триъгълник със следните върхове:
+		РќР°РјРµСЂРµС‚Рµ РЅРѕСЂРјР°Р» РІРµРєС‚РѕСЂ Р·Р° С‚СЂРёСЉРіСЉР»РЅРёРє СЃСЉСЃ СЃР»РµРґРЅРёС‚Рµ РІСЉСЂС…РѕРІРµ:
 		A = (-1.75, -1.75, -3)
 		B = (1.75, -1.75, -3)
 		C = (0, 1.75, -3)
 	*/
-	Triangle tri(Vector(-1.75, -1.75, -3), Vector(1.75, -1.75, -3), Vector(0, 1.75, -3));
-	Vector normal(tri.getNormalVector());
+	CRTTriangle tri(CRTVector(-1.75, -1.75, -3), CRTVector(1.75, -1.75, -3), CRTVector(0, 1.75, -3));
+	CRTVector normal(tri.getNormalVector());
 	float area = tri.getArea();
 	printf("trangle v0=Vector(%g, %g, %g), v1=Vector(%g, %g, %g), v2=Vector(%g, %g, %g): normal vector (%g, %g, %g) and area %g\n",
 		tri.v0.x, tri.v0.y, tri.v0.z,
@@ -132,13 +132,13 @@ int main()
 		normal.x, normal.y, normal.z, area);
 
 	/*
-		Намерете нормал вектор за триъгълник със следните върхове:
+		РќР°РјРµСЂРµС‚Рµ РЅРѕСЂРјР°Р» РІРµРєС‚РѕСЂ Р·Р° С‚СЂРёСЉРіСЉР»РЅРёРє СЃСЉСЃ СЃР»РµРґРЅРёС‚Рµ РІСЉСЂС…РѕРІРµ:
 		A = (0, 0, -1)
 		B = (1, 0, 1)
 		C = (-1, 0, 1)
 	*/
-	Triangle tri1(Vector(0, 0, -1), Vector(1, 0, 1), Vector(-1, 0, 1));
-	Vector normal1(tri1.getNormalVector());
+	CRTTriangle tri1(CRTVector(0, 0, -1), CRTVector(1, 0, 1), CRTVector(-1, 0, 1));
+	CRTVector normal1(tri1.getNormalVector());
 	float area1 = tri1.getArea();
 	printf("trangle v0=Vector(%g, %g, %g), v1=Vector(%g, %g, %g), v2=Vector(%g, %g, %g): normal vector (%g, %g, %g) and area %g\n",
 		tri1.v0.x, tri1.v0.y, tri1.v0.z,
@@ -148,13 +148,13 @@ int main()
 
 
 	/*
-		Намерете нормал вектор за триъгълник със следните върхове :
+		РќР°РјРµСЂРµС‚Рµ РЅРѕСЂРјР°Р» РІРµРєС‚РѕСЂ Р·Р° С‚СЂРёСЉРіСЉР»РЅРёРє СЃСЉСЃ СЃР»РµРґРЅРёС‚Рµ РІСЉСЂС…РѕРІРµ:
 		A = (0.56, 1.11, 1.23)
 		B = (0.44, -2.368, -0.54)
 		C = (-1.56, 0.15, -1.92)
 	*/
-	Triangle tri2(Vector(0.56, 1.11, 1.23), Vector(0.44, -2.368, -0.54), Vector(-1.56, 0.15, -1.92));
-	Vector normal2(tri2.getNormalVector());
+	CRTTriangle tri2(CRTVector(0.56, 1.11, 1.23), CRTVector(0.44, -2.368, -0.54), CRTVector(-1.56, 0.15, -1.92));
+	CRTVector normal2(tri2.getNormalVector());
 	float area2 = tri2.getArea();
 	printf("trangle v0=Vector(%g, %g, %g), v1=Vector(%g, %g, %g), v2=Vector(%g, %g, %g): normal vector (%g, %g, %g) and area %g\n",
 		tri2.v0.x, tri2.v0.y, tri2.v0.z,
