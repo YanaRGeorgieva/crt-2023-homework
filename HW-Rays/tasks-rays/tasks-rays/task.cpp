@@ -26,8 +26,8 @@ struct Vector {
 	}
 
 	Vector normalize() const {
-		float length = this->length();
-		return Vector(x / length, y / length, z / length);
+		float multiplicator = 1 / this->length();
+		return Vector(x * multiplicator, y * multiplicator, z * multiplicator);
 	}
 
 	Vector operator+ (const Vector& lhs) const {
@@ -45,8 +45,7 @@ struct Ray {
 	Ray(Vector origin, Vector direction) : origin(origin), direction(direction) {};
 };
 
-char buff[24]{};
-const char* generateCoordinateColorTask(int rowIdx, int colIdx) {
+Color generateCoordinateColorTask(int rowIdx, int colIdx) {
 	// Find its center, based on the raster coordinates
 	float x = colIdx + 0.5f;
 	float y = rowIdx + 0.5f;
@@ -64,9 +63,9 @@ const char* generateCoordinateColorTask(int rowIdx, int colIdx) {
 	Color col{};
 	col.r = rayDir.x >= 0 ? rayDir.x * maxColorComponent : (rayDir.x * -1) * maxColorComponent;
 	col.g = rayDir.y >= 0 ? rayDir.y * maxColorComponent : (rayDir.y * -1) * maxColorComponent;
-	//col.b = rayDir.z >= 0 ? rayDir.z * maxColorComponent : (rayDir.z * -1) * maxColorComponent;
-	sprintf_s(buff, "%d %d %d", col.r, col.g, col.b);
-	return buff;
+	col.b = rayDir.z >= 0 ? rayDir.z * maxColorComponent : (rayDir.z * -1) * maxColorComponent;
+
+	return col;
 }
 
 void writeFileTask() {
@@ -74,9 +73,11 @@ void writeFileTask() {
 	ppmFileStream << "P3\n";
 	ppmFileStream << imageWidth << " " << imageHeight << std::endl;
 	ppmFileStream << maxColorComponent << std::endl;
+	Color col{};
 	for (int rowIdx = 0; rowIdx < imageHeight; ++rowIdx) {
 		for (int colIdx = 0; colIdx < imageWidth; ++colIdx) {
-			ppmFileStream << generateCoordinateColorTask(rowIdx, colIdx) << "\t";
+			col = generateCoordinateColorTask(rowIdx, colIdx);
+			ppmFileStream << col.r << " " << col.g << " " << col.b << "\t";
 		}
 		ppmFileStream << std::endl;
 	}
