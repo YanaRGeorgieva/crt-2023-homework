@@ -109,76 +109,55 @@ void solutionMultipleTriangle(const std::vector<CRTTriangle>& triangles, const c
 	ppmFileStream.close();
 }
 
-
-//void writeFileTask() {
-//	std::ofstream ppmFileStream("task.ppm", std::ios::out | std::ios::binary);
-//	ppmFileStream << "P3\n";
-//	ppmFileStream << imageWidth << " " << imageHeight << std::endl;
-//	ppmFileStream << maxColorComponent << std::endl;
-//	union Color {
-//		struct { unsigned char r, g, b; };
-//		unsigned char rgb[3];
-//	} col{};
-//	for (int rowIdx = 0; rowIdx < imageHeight; ++rowIdx) {
-//		for (int colIdx = 0; colIdx < imageWidth; ++colIdx) {
-//			col = problem1(rowIdx, colIdx);
-//			ppmFileStream << col.r << " " << col.g << " " << col.b << "\t";
-//		}
-//		ppmFileStream << std::endl;
-//	}
-//
-//	ppmFileStream.close();
-//}
-
 int main() {
 
-	////Задача 1.
-	////Генерирайте картинка с резолюция по ваш избор, за която, за всеки пиксел трябва да генерирате камера лъч(подобно на Домашно 3) 
-	//// и да проверите дали ако се продължи този лъч ще се пресече с триъгълника :
-	////
-	//// CRTTriangle tri{
-	////		CRTVector(-1.75, -1.75, -3),
-	////		CRTVector(1.75, -1.75, -3),
-	////		CRTVector(0, 1.75, -3)
-	////	};
-	////
-	////Приемете че камерата се намира в(0, 0, 0) на координатната система, насочена е да “гледа” в посока - Z, 
-	//// image plane - a  се на намира на разстояние 1 пред камера, т.е.центъра на image plane - a е в(0, 0, -1)
-	////
-	////За пресичане на лъч с триъгълник може да използвате следния алгоритъм(в псевдо код) :
-	////
-	////	Generate triangles normal vectors : normalize(cross(E0, E1))
-	////	At each pixel :
-	////Generate camera ray R : 3rd Lecture
-	////If R is not parallel to the triangle’s plane : dot(N, R) != 0
-	////If R is towards the triangle’s plane : dot(V0, N) < 0
-	////	Find R - plane intersection point P : t = rpDist / rProj; p = t * rDir
-	////	Check if P is on the left of E0 : dot(N, cross(E0, V0P)) > 0
-	////	Check if P is on the left of E1 : dot(N, cross(E1, V1P)) > 0
-	////	Check if P is on the left of E2 : dot(N, cross(E2, V2P)) > 0
-	////	If P is on the left of the 3 edges, we have an intersection
-	//CRTTriangle tri{
-	//	CRTVector(-1.75, -1.75, -3),
-	//	CRTVector(1.75, -1.75, -3),
-	//	CRTVector(0, 1.75, -3)
-	//};
-	//solutionMultipleTriangle({ tri }, "originalTriangle", { RGBColor{ 0, 255, 0 } });
+	//Задача 1.
+	//Генерирайте картинка с резолюция по ваш избор, за която, за всеки пиксел трябва да генерирате камера лъч(подобно на Домашно 3) 
+	// и да проверите дали ако се продължи този лъч ще се пресече с триъгълника :
+	//
+	// CRTTriangle tri{
+	//		CRTVector(-1.75, -1.75, -3),
+	//		CRTVector(1.75, -1.75, -3),
+	//		CRTVector(0, 1.75, -3)
+	//	};
+	//
+	//Приемете че камерата се намира в(0, 0, 0) на координатната система, насочена е да “гледа” в посока - Z, 
+	// image plane - a  се на намира на разстояние 1 пред камера, т.е.центъра на image plane - a е в(0, 0, -1)
+	//
+	//За пресичане на лъч с триъгълник може да използвате следния алгоритъм(в псевдо код) :
+	//
+	//	Generate triangles normal vectors : normalize(cross(E0, E1))
+	//	At each pixel :
+	//Generate camera ray R : 3rd Lecture
+	//If R is not parallel to the triangle’s plane : dot(N, R) != 0
+	//If R is towards the triangle’s plane : dot(V0, N) < 0
+	//	Find R - plane intersection point P : t = rpDist / rProj; p = t * rDir
+	//	Check if P is on the left of E0 : dot(N, cross(E0, V0P)) > 0
+	//	Check if P is on the left of E1 : dot(N, cross(E1, V1P)) > 0
+	//	Check if P is on the left of E2 : dot(N, cross(E2, V2P)) > 0
+	//	If P is on the left of the 3 edges, we have an intersection
+	CRTTriangle tri{
+		CRTVector(-1.75, -1.75, -3),
+		CRTVector(1.75, -1.75, -3),
+		CRTVector(0, 1.75, -3)
+	};
+	solutionMultipleTriangle({ tri }, "originalTriangle", { RGBColor{ 0, 255, 0 } });
 
 
-	////Задача 2.
-	////
-	////Използвайте друг триъгълник(с други координати, по ваш избор за върхове).
-	//CRTTriangle tri1{
-	//	CRTVector(-1.75, -1.75, -3),
-	//	CRTVector(1.75, -1.75, -3),
-	//	CRTVector(2, 1.75, -3)
-	//};
-	//solutionMultipleTriangle({ tri1 }, "myTriangle", { RGBColor{ 0, 255, 0 } });
+	//Задача 2.
+	//
+	//Използвайте друг триъгълник(с други координати, по ваш избор за върхове).
+	CRTTriangle tri1{
+		CRTVector(-1.75, -1.75, -3),
+		CRTVector(1.75, -1.75, -3),
+		CRTVector(2, 1.75, -3)
+	};
+	solutionMultipleTriangle({ tri1 }, "myTriangle", { RGBColor{ 0, 255, 0 } });
 
-	////Задача 3.
-	////
-	////Добавете втори триъгълник, при проверка за пресичане на лъча трябва да обходите всички триъгълници.
-	//solutionMultipleTriangle({ tri1, tri }, "twoTriangles", { RGBColor{ 0, 255, 0 }, RGBColor{ 255, 0, 0 } });
+	//Задача 3.
+	//
+	//Добавете втори триъгълник, при проверка за пресичане на лъча трябва да обходите всички триъгълници.
+	solutionMultipleTriangle({ tri1, tri }, "twoTriangles", { RGBColor{ 0, 255, 0 }, RGBColor{ 255, 0, 0 } });
 
 	// 
 	//Задача 4.
