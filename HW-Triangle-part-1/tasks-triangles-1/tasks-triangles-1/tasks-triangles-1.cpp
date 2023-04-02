@@ -61,8 +61,8 @@ struct CRTTriangle {
 	CRTTriangle(const CRTVector& x, const CRTVector& y, const CRTVector& z) :v0(x), v1(y), v2(z) {}
 
 	CRTVector getNormalVector() const {
-		CRTVector e0 = v0 - v1;
-		CRTVector e1 = v2 - v1;
+		CRTVector e0 = v1 - v0;
+		CRTVector e1 = v2 - v0;
 		return e0.cross(e1).normalize();
 	}
 
