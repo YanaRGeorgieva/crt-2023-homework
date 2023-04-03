@@ -75,4 +75,8 @@ inline CRTVector operator* (const double scalar, const CRTVector& rhs) {
 	return CRTVector{ rhs.x * (float)scalar, rhs.y * (float)scalar, rhs.z * (float)scalar };
 }
 
+const CRTVector worstP{ std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max() ,
+				std::numeric_limits<float>::max() };
+
 #endif // !CRTVECTOR_H

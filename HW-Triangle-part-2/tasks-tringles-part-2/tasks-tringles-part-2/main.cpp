@@ -40,11 +40,6 @@ CRTRay generateCameraRay(const int rowIdx, const int colIdx) {
 	return CRTRay(CRTVector(0, 0, 0), rayDir);
 }
 
-void generateNormalVectorsAndVectorSides(const std::vector<CRTTriangle>& triangles, std::vector<NormalsAndSides>& trianglesInfo) {
-	for (auto& triangle : triangles) {
-		trianglesInfo.push_back(NormalsAndSides(triangle));
-	}
-}
 
 void solutionMultipleTriangle(const std::vector<CRTTriangle>& triangles, const char* fileName, const std::vector<RGBColor>& colors) {
 	std::ofstream ppmFileStream(std::string(fileName) + ".ppm", std::ios::out | std::ios::binary);
@@ -54,8 +49,6 @@ void solutionMultipleTriangle(const std::vector<CRTTriangle>& triangles, const c
 	RGBColor col{};
 
 	// Generate triangles normal vectors : normalize(cross(E0, E1))
-	std::vector<NormalsAndSides> trianglesInfo;
-	generateNormalVectorsAndVectorSides(triangles, trianglesInfo);
 	const size_t len = triangles.size();
 	// At each pixel :
 	for (int rowIdx = 0; rowIdx < imageHeight; ++rowIdx) {
@@ -63,44 +56,27 @@ void solutionMultipleTriangle(const std::vector<CRTTriangle>& triangles, const c
 			col = RGBColor{ 0, 0, 0 };
 			// Generate camera ray R : 3rd Lecture
 			CRTRay cameraRay = generateCameraRay(rowIdx, colIdx);
-			CRTVector bestP{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() , std::numeric_limits<float>::max() };
+			CRTVector bestP{ std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max() ,
+				std::numeric_limits<float>::max() };
+
 			for (size_t i = 0; i < len; i++) {
 				const CRTTriangle tri = triangles[i];
-				const NormalsAndSides info = trianglesInfo[i];
-				// If R is not parallel to the triangle’s plane : dot(N, R) != 0
-				if (!equals(cameraRay.direction.dot(info.triNormalVector), 0.0f)) {
-					// If R is towards the triangle’s plane : dot(V0, N) < 0
-					float rpDist = tri.v0.dot(info.triNormalVector);
-					if (rpDist < 0) {
-						// Find R - plane intersection point P : t = rpDist / rProj; p = t * rDir
-						float rProj = info.triNormalVector.dot(cameraRay.direction);
-						float t = rpDist / rProj;
-						CRTVector p = cameraRay.origin + t * cameraRay.direction;
-						//	Check if P is on the left of E0 : dot(N, cross(E0, V0P)) > 0
-						CRTVector v0p = p - tri.v0;
-						if (info.triNormalVector.dot(info.e0.cross(v0p)) > 0) {
-							//	Check if P is on the left of E1 : dot(N, cross(E1, V1P)) > 0
-							CRTVector v1p = p - tri.v1;
-							if (info.triNormalVector.dot(info.e1.cross(v1p)) > 0) {
-								//	Check if P is on the left of E2 : dot(N, cross(E2, V2P)) > 0
-								CRTVector v2p = p - tri.v2;
-								if (info.triNormalVector.dot(info.e2.cross(v2p)) > 0) {
-									//	If P is on the left of the 3 edges, we have an intersection
-									if (bestP.length() > p.length()) {
-										bestP = p;
-										col = colors[i];
-									}
-									else if (equals(bestP.length(), p.length())) {
-										col.r = (col.r + colors[i].r) / 2;
-										col.g = (col.g + colors[i].g) / 2;
-										col.b = (col.b + colors[i].b) / 2;
-									}
-								}
-							}
-						}
+				const CRTVector p = tri.intersect(cameraRay);
 
-					}
+				//	If P is on the left of the 3 edges, we have an intersection
+				if (bestP.length() > p.length()) {
+					// Get closest p (with least length)
+					bestP = p;
+					col = colors[i];
 				}
+				else if (!equals(worstP.length(), p.length()) && equals(bestP.length(), p.length())) {
+					col.r = (col.r + colors[i].r) / 2;
+					col.g = (col.g + colors[i].g) / 2;
+					col.b = (col.b + colors[i].b) / 2;
+
+				}
+
 			}
 			ppmFileStream << (int)col.r << " " << (int)col.g << " " << (int)col.b << "\t";
 		}
@@ -166,7 +142,7 @@ int main() {
 	//При пресичане имайте предвид че трябва да вземете най - близкия триъгълник до началото на лъча!
 
 	// taken from blender export
-	std::vector<CRTVector> vertices = { 
+	std::vector<CRTVector> vertices = {
 			CRTVector(0, 0, -1),
 			CRTVector(0.7236, -0.52572, -0.447215),
 			CRTVector(-0.276385, -0.85064, -0.447215),
