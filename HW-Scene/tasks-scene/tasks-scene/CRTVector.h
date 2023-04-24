@@ -1,8 +1,8 @@
 #ifndef CRTVECTOR_H
 #define CRTVECTOR_H
 
-#include <limits>
 #include <cmath>
+#include <limits>
 
 struct CRTVector {
 	float x, y, z;

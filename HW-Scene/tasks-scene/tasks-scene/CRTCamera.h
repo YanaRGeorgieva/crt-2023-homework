@@ -1,10 +1,10 @@
 #ifndef CRTCAMERA_H
 #define CRTCAMERA_H
 
-#include "CRTVector.h"
 #include "CRTRay.h"
 #include "CRTMatrix.h"
-#include "utils.h"
+#include "CRTVector.h"
+#include "CRTImageSettings.h"
 
 class CRTCamera {
 public:

@@ -1,8 +1,9 @@
 #ifndef CRTSETTINGS_H
 #define CRTSETTINGS_H
 
-#include "CRTVector.h"
 #include "utils.h"
+#include "CRTVector.h"
+#include "CRTImageSettings.h"
 
 class CRTSettings {
 public:

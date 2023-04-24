@@ -1,8 +1,8 @@
 #ifndef CRTMATRIX_H
 #define CRTMATRIX_H
 
-#include "CRTVector.h"
 #include "utils.h"
+#include "CRTVector.h"
 
 struct CRTMatrix {
 	CRTVector v0, v1, v2;

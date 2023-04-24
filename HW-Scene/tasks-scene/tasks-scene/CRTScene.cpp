@@ -1,17 +1,5 @@
 #include "CRTScene.h"
 
-std::vector<CRTMesh>& CRTScene::getGeometryObjects() {
-	return geometryObjects;
-}
-
-CRTCamera& CRTScene::getCamera() {
-	return camera;
-}
-
-CRTSettings& CRTScene::getSettings() {
-	return settings;
-}
-
 const std::vector<CRTMesh>& CRTScene::getGeometryObjects() const {
 	return geometryObjects;
 }

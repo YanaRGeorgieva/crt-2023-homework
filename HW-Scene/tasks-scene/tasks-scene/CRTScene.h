@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "utils.h"
 #include "CRTMesh.h"
+#include "CRTLight.h"
 #include "CRTCamera.h"
-#include "CRTSettings.h"
-#include "CRTMesh.h"
 #include "CRTParser.h"
+#include "CRTSettings.h"
 
 class CRTScene {
 public:
@@ -21,13 +22,9 @@ public:
 	CRTScene(const CRTScene&) = delete;
 	const CRTScene& operator=(const CRTScene&) = delete;
 
-	std::vector<CRTMesh>& getGeometryObjects();
-	CRTCamera& getCamera();
-	CRTSettings& getSettings();
-
-	const std::vector<CRTMesh>& getGeometryObjects()const;
-	const CRTCamera& getCamera()const;
-	const CRTSettings& getSettings()const;
+	const std::vector<CRTMesh>& getGeometryObjects() const;
+	const CRTCamera& getCamera() const;
+	const CRTSettings& getSettings() const;
 
 	void parseSceneFile(const std::string& sceneFileName);
 
@@ -35,6 +32,7 @@ private:
 	std::vector<CRTMesh> geometryObjects;
 	CRTCamera camera;
 	CRTSettings settings;
+	std::vector<CRTLight> lights;
 
 	CRTParser parser;
 };

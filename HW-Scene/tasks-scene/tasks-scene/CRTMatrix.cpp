@@ -54,9 +54,9 @@ CRTVector operator *(const CRTVector& a, const CRTMatrix& m) {
 	return CRTVector(a.dot(m.getCol(0)), a.dot(m.getCol(1)), a.dot(m.getCol(2)));
 }
 
-//CRTVector operator *(const CRTMatrix& m, const CRTVector& a) {
-//	return a.x * m.v0 + a.y * m.v1 + a.z * m.v2;
-//}
+CRTVector operator *(const CRTMatrix& m, const CRTVector& a) {
+	return a.x * m.v0 + a.y * m.v1 + a.z * m.v2;
+}
 
 CRTMatrix operator *(const CRTMatrix& m, const int x) {
 	return CRTMatrix(m.v0 * x, m.v1 * x, m.v2 * x);

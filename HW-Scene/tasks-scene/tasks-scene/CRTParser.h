@@ -1,18 +1,18 @@
 #ifndef CRTPARSER_H
 #define CRTPARSER_H
 
+#include <vector>
 #include <fstream>
 #include <iostream>
-#include <vector>
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 
-#include "CRTVector.h"
-#include "CRTMatrix.h"
-#include "CRTSettings.h"
-#include "CRTCamera.h"
 #include "CRTMesh.h"
+#include "CRTCamera.h"
+#include "CRTMatrix.h"
+#include "CRTVector.h"
+#include "CRTSettings.h"
 
 static const char* crtSceneSettings = "settings";
 static const char* crtSceneBGColor = "background_color";
@@ -25,19 +25,16 @@ static const char* crtScenePosition = "position";
 static const char* crtSceneObjects = "objects";
 static const char* crtSceneVertices = "vertices";
 static const char* crtSceneTriangles = "triangles";
+static const char* crtSceneLights = "lights";
 
 class CRTParser {
 public:
 	CRTParser() {
-		crtDoc = new rapidjson::Document;
+		crtDoc =  std::unique_ptr<rapidjson::Document>(new rapidjson::Document);
 	}
 
 	CRTParser(const CRTParser&) = delete;
 	const CRTParser& operator=(const CRTParser&) = delete;
-
-	~CRTParser() {
-		delete crtDoc;
-	}
 
 	void loadJsonDocument(const std::string& filename);
 	void loadSettingsAndCamera(CRTCamera& camera, CRTSettings& settings) const;
@@ -49,7 +46,7 @@ private:
 	std::vector<CRTVector>  loadArrayOfVectors(const rapidjson::Value::ConstArray& arr) const;
 	std::vector<size_t> loadArrayOfUInts(const rapidjson::Value::ConstArray& arr) const;
 
-	rapidjson::Document* crtDoc;
+	std::unique_ptr<rapidjson::Document> crtDoc;
 };
 
 #endif // !CRTPARSER_H

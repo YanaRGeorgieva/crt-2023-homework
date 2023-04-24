@@ -1,12 +1,12 @@
 #ifndef CRTMESH_H
 #define CRTMESH_H
 
+#include <ctime>
 #include <vector>
-#include <ctime>  
 
+#include "utils.h"
 #include "CRTVector.h"
 #include "CRTTriangle.h"
-#include "utils.h"
 
 class CRTMesh {
 	friend class CRTParser;
