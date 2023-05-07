@@ -11,6 +11,8 @@
 #include "CRTColor.h"
 #include "CRTImage.h"
 #include "CRTScene.h"
+#include "constants.h"
+#include "CRTMaterial.h"
 #include "CRTTriangle.h"
 #include "CRTRGBColor.h"
 
@@ -27,9 +29,6 @@ public:
 	CRTImage render(const int maxNumberOfBuckets = 64) const;
 	CRTColor intersectScene(const CRTRay& ray) const;
 
-	void setShadowBias(const float shadowBais);
-	void setAlbedo(const CRTColor& albedo);
-
 	void loadCRTScene(const std::string& sceneFilename);
 	//bool exportCRTScene(const std::string& sceneFilename) const;
 
@@ -39,24 +38,19 @@ private:
 		size_t idxTriangle;
 		CRTVector p;
 		CRTVector triN;
-		CRTColor color;
+		CRTColor hitNormal;
+		CRTColor barycentricCoordinates;
 		bool isValid;
-
-		bool operator< (const InformationIntersectionPoint& rhs) {
-			return p.length() < rhs.p.length();
-		}
+		size_t materialIndex;
 	};
 
-	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray,
-								  const size_t idxGeometryObject,
-								  const CRTMesh& geometryObject) const;
+	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject) const;
+	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, int depth = 0) const;
 	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects) const;
-	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects) const;
+
 	void processSubimage(CRTImage& subImage) const;
 
 	std::unique_ptr<CRTScene> scene;
-	CRTVector albedo;
-	float shadowBias;
 };
 
 #endif // !CRTRENDERER_H

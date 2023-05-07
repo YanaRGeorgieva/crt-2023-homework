@@ -6,8 +6,8 @@
 #include <vector>
 #include <iostream>
 
-#include "utils.h"
 #include "CRTColor.h"
+#include "constants.h"
 #include "CRTRGBColor.h"
 
 class CRTImage {

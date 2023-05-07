@@ -1,7 +1,7 @@
 #ifndef CRTMATRIX_H
 #define CRTMATRIX_H
 
-#include "utils.h"
+#include "constants.h"
 #include "CRTVector.h"
 
 struct CRTMatrix {

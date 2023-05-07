@@ -105,11 +105,11 @@ void CRTParser::loadSettingsAndCamera(CRTCamera& camera, CRTSettings& settings) 
 
 	const rapidjson::Value& cameraVal = crtDoc->FindMember(crtSceneCamera)->value;
 	if (!cameraVal.IsNull() && cameraVal.IsObject()) {
-		const rapidjson::Value& matrixVal = cameraVal.FindMember(crtSceneMatrix)->value;
+		const rapidjson::Value& matrixVal = cameraVal.FindMember(crtSceneCameraMatrix)->value;
 		assert(!matrixVal.IsNull() && matrixVal.IsArray());
 		loadMatrix(matrixVal.GetArray(), camera.rotation);
 
-		const rapidjson::Value& positionVal = cameraVal.FindMember(crtScenePosition)->value;
+		const rapidjson::Value& positionVal = cameraVal.FindMember(crtSceneCameraPosition)->value;
 		assert(!positionVal.IsNull() && positionVal.IsArray());
 		loadVector(positionVal.GetArray(), camera.position);
 	}
@@ -123,15 +123,18 @@ std::vector<CRTMesh> CRTParser::loadObjects() const {
 		rapidjson::SizeType len = arr.Size();
 		geometryObjects.reserve(arr.Size());
 		for (rapidjson::SizeType i = 0; i < len; i++) {
-			const rapidjson::Value& verticesVal = arr[i][crtSceneVertices];
+			const rapidjson::Value& verticesVal = arr[i][crtSceneObjectVertices];
 			assert(!verticesVal.IsNull() && verticesVal.IsArray());
 
-			const rapidjson::Value& trianglesVal = arr[i][crtSceneTriangles];
+			const rapidjson::Value& trianglesVal = arr[i][crtSceneObjectTriangles];
 			assert(!trianglesVal.IsNull() && trianglesVal.IsArray());
 
-			geometryObjects.emplace_back(loadArrayOfVectors(verticesVal.GetArray()), loadArrayOfUInts(trianglesVal.GetArray()));
+			const rapidjson::Value& materialIndexVal = arr[i][crtSceneObjectMaterialIndex];
+			assert(!materialIndexVal.IsNull() && materialIndexVal.IsUint());
 
-			geometryObjects[i].generateGeometryAndColoring();
+			geometryObjects.emplace_back(loadArrayOfVectors(verticesVal.GetArray()), loadArrayOfUInts(trianglesVal.GetArray()), materialIndexVal.GetUint());
+
+			geometryObjects[i].generateGeometry();
 		}
 	}
 	return geometryObjects;
@@ -155,4 +158,27 @@ std::vector<CRTLight> CRTParser::loadLights() const {
 		}
 	}
 	return lights;
+}
+
+std::vector<CRTMaterial> CRTParser::loadMaterials() const {
+	std::vector<CRTMaterial> materials;
+	const rapidjson::Value& materialsVal = crtDoc->FindMember(crtSceneMaterials)->value;
+	if (!materialsVal.IsNull() && materialsVal.IsArray()) {
+		auto arr = materialsVal.GetArray();
+		rapidjson::SizeType len = arr.Size();
+		materials.reserve(arr.Size());
+		for (rapidjson::SizeType i = 0; i < len; i++) {
+			const rapidjson::Value& materialTypeVal = arr[i][crtSceneMaterialType];
+			assert(!materialTypeVal.IsNull() && materialTypeVal.IsString());
+
+			const rapidjson::Value& materialAlbedoVal = arr[i][crtSceneMaterialAlbedo];
+			assert(!materialAlbedoVal.IsNull() && materialAlbedoVal.IsArray());
+
+			const rapidjson::Value& materialIsSmoothShaded = arr[i][crtSceneMaterialIsSmoothShaded];
+			assert(!materialIsSmoothShaded.IsNull() && materialIsSmoothShaded.IsBool());
+
+			materials.emplace_back(loadVector(materialAlbedoVal.GetArray()), materialTypeVal.GetString(), materialIsSmoothShaded.GetBool());
+		}
+	}
+	return materials;
 }

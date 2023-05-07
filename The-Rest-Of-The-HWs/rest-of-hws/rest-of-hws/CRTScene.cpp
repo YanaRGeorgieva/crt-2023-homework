@@ -16,9 +16,14 @@ const std::vector<CRTLight>& CRTScene::getLights() const {
 	return lights;
 }
 
+const std::vector<CRTMaterial>& CRTScene::getMaterials() const {
+	return materials;
+}
+
 void CRTScene::parseSceneFile(const std::string& sceneFileName) {
 	parser.loadJsonDocument(sceneFileName);
 	parser.loadSettingsAndCamera(camera, settings);
 	geometryObjects = parser.loadObjects();
 	lights = parser.loadLights();
+	materials = parser.loadMaterials();
 }

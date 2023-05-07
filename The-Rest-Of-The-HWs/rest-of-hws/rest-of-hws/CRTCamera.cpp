@@ -1,6 +1,6 @@
 #include "CRTCamera.h"
 
-CRTRay CRTCamera::generateCameraRay(const int rowIdx, const int colIdx) const {
+CRTRay CRTCamera::generateCameraRay(const size_t& rowIdx, const size_t& colIdx) const {
 	// Find its center, based on the raster coordinates
 	float x = colIdx + 0.5f;
 	float y = rowIdx + 0.5f;

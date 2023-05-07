@@ -1,7 +1,7 @@
 #ifndef CRTSETTINGS_H
 #define CRTSETTINGS_H
 
-#include "utils.h"
+#include "constants.h"
 #include "CRTVector.h"
 #include "CRTImageSettings.h"
 

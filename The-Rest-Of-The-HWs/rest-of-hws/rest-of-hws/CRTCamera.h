@@ -12,7 +12,7 @@ public:
 
 	CRTCamera() : position(zeroVector), rotation(identityMatrix) { }
 
-	CRTRay generateCameraRay(const int rowIdx, const int colIdx) const;
+	CRTRay generateCameraRay(const size_t& rowIdx, const size_t& colIdx) const;
 
 	void updateImageSettings(const ImageSettings& settings);
 

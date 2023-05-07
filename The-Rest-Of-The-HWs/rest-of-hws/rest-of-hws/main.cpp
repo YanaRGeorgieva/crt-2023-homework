@@ -1,12 +1,16 @@
 ﻿#include "CRTRenderer.h"
 
 int main() {
-	srand(time(NULL));
 	CRTRenderer renderer;
-	renderer.loadCRTScene("scene1.crtscene");
-	renderer.setAlbedo(CRTColor(0.5, 0.2, 0.3));
-	renderer.setShadowBias(0.0001f);
-	CRTImage image = renderer.render();
-	image.writeToPPMFile("scene1");
+	std::string name = "scene";
+	for (size_t i = 1; i < 2; i++) {
+		std::string idx = std::to_string(i);
+		renderer.loadCRTScene(name + idx + ".crtscene");
+		CRTImage image = renderer.render();
+		image.writeToPPMFile(name + idx);
+	}
+	//renderer.loadCRTScene("a.crtscene");
+	//CRTImage image = renderer.render();
+	//image.writeToPPMFile("a");
 	return 0;
 }

@@ -13,6 +13,7 @@
 #include "CRTCamera.h"
 #include "CRTMatrix.h"
 #include "CRTVector.h"
+#include "CRTMaterial.h"
 #include "CRTSettings.h"
 
 static const char* crtSceneSettings = "settings";
@@ -20,15 +21,24 @@ static const char* crtSceneBGColor = "background_color";
 static const char* crtSceneImageSettings = "image_settings";
 static const char* crtSceneImageWidth = "width";
 static const char* crtSceneImageHeight = "height";
+
 static const char* crtSceneCamera = "camera";
-static const char* crtSceneMatrix = "matrix";
-static const char* crtScenePosition = "position";
+static const char* crtSceneCameraMatrix = "matrix";
+static const char* crtSceneCameraPosition = "position";
+
 static const char* crtSceneObjects = "objects";
-static const char* crtSceneVertices = "vertices";
-static const char* crtSceneTriangles = "triangles";
+static const char* crtSceneObjectVertices = "vertices";
+static const char* crtSceneObjectTriangles = "triangles";
+static const char* crtSceneObjectMaterialIndex = "material_index";
+
 static const char* crtSceneLights = "lights";
 static const char* crtSceneLightsPosition = "position";
 static const char* crtSceneLightsIntensity = "intensity";
+
+static const char* crtSceneMaterials = "materials";
+static const char* crtSceneMaterialType = "type";
+static const char* crtSceneMaterialAlbedo = "albedo";
+static const char* crtSceneMaterialIsSmoothShaded = "smooth_shading";
 
 class CRTParser {
 public:
@@ -43,6 +53,7 @@ public:
 	void loadSettingsAndCamera(CRTCamera& camera, CRTSettings& settings) const;
 	std::vector<CRTMesh> loadObjects() const;
 	std::vector<CRTLight> loadLights() const;
+	std::vector<CRTMaterial> loadMaterials() const;
 
 private:
 	void loadVector(const rapidjson::Value::ConstArray& arr, CRTVector& vec) const;

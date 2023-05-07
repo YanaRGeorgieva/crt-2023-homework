@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 
-#include "utils.h"
 #include "CRTMesh.h"
 #include "CRTLight.h"
+#include "constants.h"
 #include "CRTCamera.h"
 #include "CRTParser.h"
+#include "CRTMaterial.h"
 #include "CRTSettings.h"
 
 class CRTScene {
@@ -27,6 +28,7 @@ public:
 	const CRTCamera& getCamera() const;
 	const CRTSettings& getSettings() const;
 	const std::vector<CRTLight>& getLights() const;
+	const std::vector<CRTMaterial>& getMaterials() const;
 
 	void parseSceneFile(const std::string& sceneFileName);
 
@@ -35,6 +37,7 @@ private:
 	CRTCamera camera;
 	CRTSettings settings;
 	std::vector<CRTLight> lights;
+	std::vector<CRTMaterial> materials;
 
 	CRTParser parser;
 };
