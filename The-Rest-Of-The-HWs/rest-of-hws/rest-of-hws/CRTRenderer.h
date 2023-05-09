@@ -42,6 +42,28 @@ private:
 		CRTColor barycentricCoordinates;
 		bool isValid;
 		size_t materialIndex;
+
+		void set(const size_t& idxGeometryObject,
+			const size_t& idxTriangleI,
+			const CRTTriangle& triangle,
+			const CRTTriangle::retDataFromTriIntersect intersectData,
+			const CRTMesh& geometryObject,
+			const std::vector<CRTVector>& vertexNormals,
+			const std::vector<size_t>& faces
+		) {
+			idxGeometry = idxGeometryObject;
+			idxTriangle = idxTriangleI;
+			p = intersectData.p;
+			triN = triangle.getFaceNormal();
+			const size_t idx = idxTriangleI * 3;
+			hitNormal =
+				(vertexNormals[faces[idx + 1]] * intersectData.barycentricCoordinates.x +
+					vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
+					vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
+			barycentricCoordinates = intersectData.barycentricCoordinates;
+			isValid = true;
+			materialIndex = geometryObject.getMaterialIdx();
+		}
 	};
 
 	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject) const;

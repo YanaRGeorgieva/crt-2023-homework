@@ -169,7 +169,7 @@ CRTColor CRTRenderer::shade(const CRTRenderer::InformationIntersectionPoint& bes
 		// Calculate the Cosine Law:
 		float cosLaw = normLightDir.dot(shadeNormal);
 		if (cosLaw < 0.0f) { continue; }
-		// Compute shere area
+		// Compute sphere area
 		float sa = 4 * (float)M_PI * sr * sr;
 		// Create shadowRay
 		CRTRay shadowRay(bestIntersectionPoint.p + shadeNormal * SHADOW_BIAS, normLightDir);
@@ -203,18 +203,7 @@ CRTRenderer::InformationIntersectionPoint CRTRenderer::intersectRayWithAnObject(
 		if (bestT > intersectData.t) {
 			// Get closest p (with least length)
 			bestT = intersectData.t;
-			intersectionPointInfo.idxGeometry = idxGeometryObject;
-			intersectionPointInfo.idxTriangle = i;
-			intersectionPointInfo.p = intersectData.p;
-			intersectionPointInfo.triN = tri.getFaceNormal();
-			const size_t idx = i * 3;
-			intersectionPointInfo.hitNormal =
-				(vertexNormals[faces[idx + 1]] * intersectData.barycentricCoordinates.x +
-					vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
-					vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
-			intersectionPointInfo.barycentricCoordinates = intersectData.barycentricCoordinates;
-			intersectionPointInfo.isValid = true;
-			intersectionPointInfo.materialIndex = geometryObject.getMaterialIdx();
+			intersectionPointInfo.set(idxGeometryObject, i, tri, intersectData, geometryObject, vertexNormals, faces);
 		}
 	}
 	return intersectionPointInfo;
