@@ -33,7 +33,7 @@ public:
 		float t;
 	};
 
-	retDataFromTriIntersect intersect(const CRTRay& ray, const float lastT = std::numeric_limits<float>::max()) const;
+	retDataFromTriIntersect intersect(const CRTRay& ray, const float thresholdT = std::numeric_limits<float>::max()) const;
 private:
 	void computeFaceNormal();
 
