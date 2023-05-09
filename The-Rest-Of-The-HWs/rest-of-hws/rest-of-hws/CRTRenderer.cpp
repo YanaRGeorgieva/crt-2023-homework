@@ -79,88 +79,67 @@ void CRTRenderer::processSubimage(CRTImage& subImage) const {
 	}
 }
 
-CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, int depth) const {
+CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
+	const std::vector<CRTMesh>& geometryObjects,
+	int depth) const {
+
 	if (depth > MAX_DEPTH) {
 		return scene->getSettings().getBGColor();
 	}
 
 	InformationIntersectionPoint intersectionPoint{};
-	InformationIntersectionPoint bestIntersectionPoint{};
-	bestIntersectionPoint.p = worstP;
-	bestIntersectionPoint.isValid = false;
+	InformationIntersectionPoint bestIntersectionPointInfo{};
+	bestIntersectionPointInfo.p = worstP;
+	bestIntersectionPointInfo.isValid = false;
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
 		intersectionPoint = intersectRayWithAnObject(ray, i, geometryObjects[i]);
 		if (intersectionPoint.isValid &&
-			(bestIntersectionPoint.p - ray.origin).length() > (intersectionPoint.p - ray.origin).length()) {
-			bestIntersectionPoint = intersectionPoint;
+			(bestIntersectionPointInfo.p - ray.origin).length() > (intersectionPoint.p - ray.origin).length()) {
+			bestIntersectionPointInfo = intersectionPoint;
 		}
 	}
 
-	if (!bestIntersectionPoint.isValid) {
+	if (!bestIntersectionPointInfo.isValid) {
 		return scene->getSettings().getBGColor();
 	}
 
 	const std::vector<CRTMaterial>& materials = scene->getMaterials();
-	const CRTMaterial& material = materials[bestIntersectionPoint.materialIndex];
+	const CRTMaterial& material = materials[bestIntersectionPointInfo.materialIndex];
 
-	CRTVector normal = bestIntersectionPoint.triN;
+	CRTVector shadeNormal = bestIntersectionPointInfo.triN;
 	if (material.isSmoothShaded) {
-		normal = bestIntersectionPoint.hitNormal;
+		shadeNormal = bestIntersectionPointInfo.hitNormal;
 	}
 
 	CRTColor returnCol{};
 	if (material.type == "diffuse") {
-		const std::vector<CRTLight>& lights = scene->getLights();
-		const size_t lightsCnt = lights.size();
-		if (lightsCnt == 0) {
-			// For the triangle scene
-			return bestIntersectionPoint.barycentricCoordinates;
-		}
-		// For all lights in the scene:
-		for (size_t i = 0; i < lightsCnt; i++) {
-			// Compute the direction from p to the light position:
-			CRTVector lightDir = lights[i].position - bestIntersectionPoint.p;
-			// Compute sphere radius:
-			float sr = lightDir.length();
-			// Normilize lightDir
-			CRTVector normLightDir = lightDir.normalize();
-			// Calculate the Cosine Law:
-			float tmpCosLaw = normLightDir.dot(normal);
-			float cosLaw = tmpCosLaw < 0.0f ? 0.0f : tmpCosLaw;
-			// Compute shere area
-			float sa = 4 * (float)M_PI * sr * sr;
-			// Create shadowRay
-			CRTRay shadowRay(bestIntersectionPoint.p + normal * SHADOW_BIAS, normLightDir);
-			//Trace shadowRay to check for triangle intersection
-			bool hasIntersection = hasIntersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects());
-			CRTColor lightContribution;
-			lightContribution = hasIntersection ? CRTColor{ } : CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
-			returnCol += lightContribution;
-		}
+		returnCol = shade(bestIntersectionPointInfo, shadeNormal, material);
 	}
 	else if (material.type == "reflective") {
 		// Create reflectionRay
-		CRTVector Y = ray.direction.dot(normal) * normal;
-		CRTVector X = ray.direction - ray.direction.dot(normal) * normal;
-		CRTRay reflectionRay(bestIntersectionPoint.p + normal * SHADOW_BIAS, X - Y);
+		CRTVector Y = ray.direction.dot(shadeNormal) * shadeNormal;
+		CRTVector X = ray.direction - ray.direction.dot(shadeNormal) * shadeNormal;
+		CRTRay reflectionRay(bestIntersectionPointInfo.p + shadeNormal * SHADOW_BIAS, X - Y);
 		CRTColor reflectionColor = intersectRayWithObjectsInScene(reflectionRay, geometryObjects, depth + 1);
 		returnCol = reflectionColor * material.albedo;
 	}
 	return returnCol;
 }
 
-bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects) const {
+bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray,
+	const std::vector<CRTMesh>& geometryObjects,
+	const float lightLength) const {
+
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
 		const std::vector<CRTTriangle>& triangles = geometryObjects[i].getTriangles();
 		const size_t len = triangles.size();
 		for (size_t i = 0; i < len; i++) {
-			const CRTTriangle& tri = triangles[i];
-			const std::pair<CRTVector, CRTVector>& pAndBarycentricCoords = tri.intersect(ray);
+			const CRTTriangle::retDataFromTriIntersect& intersectData = triangles[i].intersect(ray, lightLength);
 			//	If P is on the left of the 3 edges and t > 0, we have an intersection
-			if ((worstP - ray.origin).length() > (pAndBarycentricCoords.first - ray.origin).length()) {
+			if (lightLength > intersectData.t) {
 				return true;
 			}
 		}
@@ -168,42 +147,77 @@ bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std
 	return false;
 }
 
+CRTColor CRTRenderer::shade(const CRTRenderer::InformationIntersectionPoint& bestIntersectionPoint,
+	const CRTVector& shadeNormal,
+	const CRTMaterial& material) const {
+
+	CRTColor finalColor{};
+	const std::vector<CRTLight>& lights = scene->getLights();
+	const size_t lightsCnt = lights.size();
+	if (lightsCnt == 0) {
+		// For the triangle scene
+		return bestIntersectionPoint.barycentricCoordinates;
+	}
+	// For all lights in the scene:
+	for (size_t i = 0; i < lightsCnt; i++) {
+		// Compute the direction from p to the light position:
+		CRTVector lightDir = lights[i].position - bestIntersectionPoint.p;
+		// Compute sphere radius:
+		float sr = lightDir.length();
+		// Normalize lightDir
+		CRTVector normLightDir = lightDir.normalize();
+		// Calculate the Cosine Law:
+		float cosLaw = normLightDir.dot(shadeNormal);
+		if (cosLaw < 0.0f) { continue; }
+		// Compute shere area
+		float sa = 4 * (float)M_PI * sr * sr;
+		// Create shadowRay
+		CRTRay shadowRay(bestIntersectionPoint.p + shadeNormal * SHADOW_BIAS, normLightDir);
+		//Trace shadowRay to check for triangle intersection
+		bool hasIntersection = hasIntersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects(), sr);
+		CRTColor lightContribution = hasIntersection ? CRTColor{ } :
+			CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
+		finalColor += lightContribution;
+	}
+	return finalColor;
+}
 
 CRTRenderer::InformationIntersectionPoint CRTRenderer::intersectRayWithAnObject(const CRTRay& ray,
 	const size_t idxGeometryObject,
 	const CRTMesh& geometryObject) const {
-	CRTVector bestP{ worstP };
+
+	float bestT{ std::numeric_limits<float>::max() };
 
 	const std::vector<CRTTriangle>& triangles = geometryObject.getTriangles();
 	const std::vector<size_t>& faces = geometryObject.getFaces();
 	const std::vector<CRTVector>& vertexNormals = geometryObject.getVertexNormals();
 
-	InformationIntersectionPoint intersectionPoint{};
-	intersectionPoint.isValid = false;
+	InformationIntersectionPoint intersectionPointInfo{};
+	intersectionPointInfo.isValid = false;
 
 	const size_t len = triangles.size();
 	for (size_t i = 0; i < len; i++) {
 		const CRTTriangle& tri = triangles[i];
-		const std::pair<CRTVector, CRTVector>& pAndBarycentricCoords = tri.intersect(ray);
+		const CRTTriangle::retDataFromTriIntersect& intersectData = tri.intersect(ray, bestT);
 		//	If P is on the left of the 3 edges and t > 0, we have an intersection
-		if ((bestP - ray.origin).length() > (pAndBarycentricCoords.first - ray.origin).length()) {
+		if (bestT > intersectData.t) {
 			// Get closest p (with least length)
-			bestP = pAndBarycentricCoords.first;
-			intersectionPoint.idxGeometry = idxGeometryObject;
-			intersectionPoint.idxTriangle = i;
-			intersectionPoint.p = pAndBarycentricCoords.first;
-			intersectionPoint.triN = tri.getFaceNormal();
+			bestT = intersectData.t;
+			intersectionPointInfo.idxGeometry = idxGeometryObject;
+			intersectionPointInfo.idxTriangle = i;
+			intersectionPointInfo.p = intersectData.p;
+			intersectionPointInfo.triN = tri.getFaceNormal();
 			const size_t idx = i * 3;
-			intersectionPoint.hitNormal =
-				(vertexNormals[faces[idx + 1]] * pAndBarycentricCoords.second.x +
-					vertexNormals[faces[idx + 2]] * pAndBarycentricCoords.second.y +
-					vertexNormals[faces[idx]] * pAndBarycentricCoords.second.z).normalize();
-			intersectionPoint.barycentricCoordinates = pAndBarycentricCoords.second;
-			intersectionPoint.isValid = true;
-			intersectionPoint.materialIndex = geometryObject.getMaterialIdx();
+			intersectionPointInfo.hitNormal =
+				(vertexNormals[faces[idx + 1]] * intersectData.barycentricCoordinates.x +
+					vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
+					vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
+			intersectionPointInfo.barycentricCoordinates = intersectData.barycentricCoordinates;
+			intersectionPointInfo.isValid = true;
+			intersectionPointInfo.materialIndex = geometryObject.getMaterialIdx();
 		}
 	}
-	return intersectionPoint;
+	return intersectionPointInfo;
 }
 
 void CRTRenderer::loadCRTScene(const std::string& sceneFilename) {

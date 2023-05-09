@@ -27,7 +27,13 @@ public:
 
 	float getArea() const;
 
-	std::pair<CRTVector, CRTVector> intersect(const CRTRay& ray) const;
+	struct retDataFromTriIntersect {
+		CRTVector p;
+		CRTVector barycentricCoordinates;
+		float t;
+	};
+
+	retDataFromTriIntersect intersect(const CRTRay& ray, const float lastT = std::numeric_limits<float>::max()) const;
 private:
 	void computeFaceNormal();
 

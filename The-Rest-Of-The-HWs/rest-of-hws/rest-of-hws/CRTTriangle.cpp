@@ -18,8 +18,8 @@ float CRTTriangle::getArea() const {
 	return e0.cross(e1).length() / 2;
 }
 
-std::pair<CRTVector, CRTVector> CRTTriangle::intersect(const CRTRay& ray) const {
-	std::pair<CRTVector, CRTVector> worstRes(worstP, worstP);
+CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, const float lastT) const {
+	retDataFromTriIntersect worstRes{ worstP, worstP, std::numeric_limits<float>::max() };
 
 	// If R is not parallel to the triangle’s plane : dot(N, R) != 0
 	const float rProj = faceNormal.dot(ray.direction);
@@ -35,7 +35,7 @@ std::pair<CRTVector, CRTVector> CRTTriangle::intersect(const CRTRay& ray) const 
 	const CRTVector p = ray.origin + t * ray.direction;
 
 	// For shading t > 0
-	if (t < 0.0f || equals(t, 0.0f)) {
+	if (t < 0.0f || equals(t, 0.0f) || lastT < t || equals(lastT, t)) {
 		return worstRes;
 	}
 
@@ -68,5 +68,5 @@ std::pair<CRTVector, CRTVector> CRTTriangle::intersect(const CRTRay& ray) const 
 	const float w = 1 - u - v;
 	CRTVector barycentricCoordinates(u, v, w);
 
-	return std::pair<CRTVector, CRTVector>(p, barycentricCoordinates);
+	return retDataFromTriIntersect{ p, barycentricCoordinates, t };
 }

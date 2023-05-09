@@ -46,7 +46,11 @@ private:
 
 	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject) const;
 	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, int depth = 0) const;
-	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects) const;
+	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, const float lightLength) const;
+
+	CRTColor shade(const InformationIntersectionPoint& bestIntersectionPoint,
+		const CRTVector& shadeNormal,
+		const CRTMaterial& material) const;
 
 	void processSubimage(CRTImage& subImage) const;
 
