@@ -37,6 +37,7 @@ private:
 		size_t idxGeometry;
 		size_t idxTriangle;
 		CRTVector p;
+		float t;
 		CRTVector triN;
 		CRTColor hitNormal;
 		CRTColor barycentricCoordinates;
@@ -54,6 +55,7 @@ private:
 			idxGeometry = idxGeometryObject;
 			idxTriangle = idxTriangleI;
 			p = intersectData.p;
+			t = intersectData.t;
 			triN = triangle.getFaceNormal();
 			const size_t idx = idxTriangleI * 3;
 			hitNormal =
@@ -66,7 +68,7 @@ private:
 		}
 	};
 
-	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject) const;
+	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject, float& bestT) const;
 	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, int depth = 0) const;
 	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, const float lightLength) const;
 

@@ -92,11 +92,12 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 	bestIntersectionPointInfo.p = worstP;
 	bestIntersectionPointInfo.isValid = false;
 
+	float bestT{ std::numeric_limits<float>::max() };
+
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
-		intersectionPoint = intersectRayWithAnObject(ray, i, geometryObjects[i]);
-		if (intersectionPoint.isValid &&
-			(bestIntersectionPointInfo.p - ray.origin).length() > (intersectionPoint.p - ray.origin).length()) {
+		intersectionPoint = intersectRayWithAnObject(ray, i, geometryObjects[i], bestT);
+		if (intersectionPoint.isValid) {
 			bestIntersectionPointInfo = intersectionPoint;
 		}
 	}
@@ -184,9 +185,8 @@ CRTColor CRTRenderer::shade(const CRTRenderer::InformationIntersectionPoint& bes
 
 CRTRenderer::InformationIntersectionPoint CRTRenderer::intersectRayWithAnObject(const CRTRay& ray,
 	const size_t idxGeometryObject,
-	const CRTMesh& geometryObject) const {
-
-	float bestT{ std::numeric_limits<float>::max() };
+	const CRTMesh& geometryObject,
+	float& bestT) const {
 
 	const std::vector<CRTTriangle>& triangles = geometryObject.getTriangles();
 	const std::vector<size_t>& faces = geometryObject.getFaces();
