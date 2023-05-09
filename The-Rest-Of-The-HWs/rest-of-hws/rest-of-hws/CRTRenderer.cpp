@@ -114,10 +114,10 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 	}
 
 	CRTColor returnCol{};
-	if (material.type == "diffuse") {
+	if (material.type == CRTMaterial::DIFFUSE) {
 		returnCol = shade(bestIntersectionPointInfo, shadeNormal, material);
 	}
-	else if (material.type == "reflective") {
+	else if (material.type == CRTMaterial::REFLECTIVE) {
 		// Create reflectionRay
 		CRTVector Y = ray.direction.dot(shadeNormal) * shadeNormal;
 		CRTVector X = ray.direction - ray.direction.dot(shadeNormal) * shadeNormal;
