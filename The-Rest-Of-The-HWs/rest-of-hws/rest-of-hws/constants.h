@@ -4,7 +4,7 @@
 #include <cmath>
 const double M_PI = 3.14159265358979323846;
 
-const float SHADOW_BIAS = 0.0001f;
+const float SHADOW_BIAS = 0.01f;
 
 const int MAX_DEPTH = 4;
 
