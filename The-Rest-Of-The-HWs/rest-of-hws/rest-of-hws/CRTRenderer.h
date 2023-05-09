@@ -68,9 +68,16 @@ private:
 		}
 	};
 
-	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray, const size_t idxGeometryObject, const CRTMesh& geometryObject, float& bestT) const;
-	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, int depth = 0) const;
-	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray, const std::vector<CRTMesh>& geometryObjects, const float lightLength) const;
+	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray,
+		const size_t idxGeometryObject,
+		const CRTMesh& geometryObject,
+		float& bestT) const;
+	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray,
+		const std::vector<CRTMesh>& geometryObjects,
+		int depth = 0) const;
+	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray,
+		const std::vector<CRTMesh>& geometryObjects,
+		const float thresholdPminusLight) const;
 
 	CRTColor shade(const InformationIntersectionPoint& bestIntersectionPoint,
 		const CRTVector& shadeNormal,

@@ -117,8 +117,7 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 	CRTColor returnCol{};
 	if (material.type == CRTMaterial::DIFFUSE) {
 		returnCol = shade(bestIntersectionPointInfo, shadeNormal, material);
-	}
-	else if (material.type == CRTMaterial::REFLECTIVE) {
+	} else if (material.type == CRTMaterial::REFLECTIVE) {
 		// Create reflectionRay
 		CRTVector Y = ray.direction.dot(shadeNormal) * shadeNormal;
 		CRTVector X = ray.direction - ray.direction.dot(shadeNormal) * shadeNormal;
@@ -131,16 +130,16 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 
 bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray,
 	const std::vector<CRTMesh>& geometryObjects,
-	const float lightLength) const {
+	const float thresholdPminusLight) const {
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
 		const std::vector<CRTTriangle>& triangles = geometryObjects[i].getTriangles();
 		const size_t len = triangles.size();
 		for (size_t i = 0; i < len; i++) {
-			const CRTTriangle::retDataFromTriIntersect& intersectData = triangles[i].intersect(ray, lightLength);
+			const CRTTriangle::retDataFromTriIntersect& intersectData = triangles[i].intersect(ray, thresholdPminusLight);
 			//	If P is on the left of the 3 edges and t > 0, we have an intersection
-			if (lightLength > intersectData.t) {
+			if (thresholdPminusLight > intersectData.t) {
 				return true;
 			}
 		}

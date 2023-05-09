@@ -18,7 +18,7 @@ float CRTTriangle::getArea() const {
 	return e0.cross(e1).length() / 2;
 }
 
-CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, const float lastT) const {
+CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, const float thresholdT) const {
 	retDataFromTriIntersect worstRes{ worstP, worstP, std::numeric_limits<float>::max() };
 
 	// If R is not parallel to the triangle’s plane : dot(N, R) != 0
@@ -35,7 +35,7 @@ CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, c
 	const CRTVector p = ray.origin + t * ray.direction;
 
 	// For shading t > 0
-	if (t < 0.0f || equals(t, 0.0f) || lastT < t || equals(lastT, t)) {
+	if (t < 0.0f || equals(t, 0.0f) || thresholdT < t || equals(thresholdT, t)) {
 		return worstRes;
 	}
 
