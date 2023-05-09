@@ -89,7 +89,6 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 
 	InformationIntersectionPoint intersectionPoint{};
 	InformationIntersectionPoint bestIntersectionPointInfo{};
-	bestIntersectionPointInfo.p = worstP;
 	bestIntersectionPointInfo.isValid = false;
 
 	float bestT{ std::numeric_limits<float>::max() };
@@ -119,9 +118,8 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 		returnCol = shade(bestIntersectionPointInfo, shadeNormal, material);
 	} else if (material.type == CRTMaterial::REFLECTIVE) {
 		// Create reflectionRay
-		CRTVector Y = ray.direction.dot(shadeNormal) * shadeNormal;
-		CRTVector X = ray.direction - ray.direction.dot(shadeNormal) * shadeNormal;
-		CRTRay reflectionRay(bestIntersectionPointInfo.p + shadeNormal * SHADOW_BIAS, X - Y);
+		CRTRay reflectionRay(bestIntersectionPointInfo.p + shadeNormal * SHADOW_BIAS, 
+			ray.direction - 2 * ray.direction.dot(shadeNormal) * shadeNormal);
 		CRTColor reflectionColor = intersectRayWithObjectsInScene(reflectionRay, geometryObjects, depth + 1);
 		returnCol = reflectionColor * material.albedo;
 	}
