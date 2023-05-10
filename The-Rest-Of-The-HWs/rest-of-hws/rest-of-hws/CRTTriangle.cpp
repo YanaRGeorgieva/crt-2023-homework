@@ -19,12 +19,12 @@ float CRTTriangle::getArea() const {
 }
 
 CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, const float thresholdT) const {
-	retDataFromTriIntersect worstRes{ worstP, worstP, std::numeric_limits<float>::max() };
+	retDataFromTriIntersect worstResult{ worstP, worstP, std::numeric_limits<float>::max() };
 
 	// If R is not parallel to the triangle’s plane : dot(N, R) != 0
 	const float rProj = faceNormal.dot(ray.direction);
 	if (equals(rProj, 0.0f)) {
-		return worstRes;
+		return worstResult;
 	}
 
 	// Calculate distance to triangle's plane
@@ -36,28 +36,28 @@ CRTTriangle::retDataFromTriIntersect CRTTriangle::intersect(const CRTRay& ray, c
 
 	// For shading t > 0
 	if (t < 0.0f || equals(t, 0.0f) || thresholdT < t || equals(thresholdT, t)) {
-		return worstRes;
+		return worstResult;
 	}
 
 	// Check if P is on the left of E0 : dot(N, cross(E0, V0P)) > 0
 	const CRTVector v0p = p - v0;
 	const float dotTriNormalWithe0xv0p = faceNormal.dot(e0.cross(v0p));
-	if (dotTriNormalWithe0xv0p < 0.0f || equals(dotTriNormalWithe0xv0p, 0.0f)) {
-		return worstRes;
+	if (dotTriNormalWithe0xv0p < -ROUNDING_ERROR_f32) {
+		return worstResult;
 	}
 
 	// Check if P is on the left of E1 : dot(N, cross(E1, V1P)) > 0
 	const CRTVector v1p = p - v1;
 	const float dotTriNormalWithe1xv1p = faceNormal.dot(e1.cross(v1p));
-	if (dotTriNormalWithe1xv1p < 0.0f || equals(dotTriNormalWithe1xv1p, 0.0f)) {
-		return worstRes;
+	if (dotTriNormalWithe1xv1p < -ROUNDING_ERROR_f32) {
+		return worstResult;
 	}
 
 	// Check if P is on the left of E2 : dot(N, cross(E2, V2P)) > 0
 	const CRTVector v2p = p - v2;
 	const float dotTriNormalWithe2xv2p = faceNormal.dot(e2.cross(v2p));
-	if (dotTriNormalWithe2xv2p < 0.0f || equals(dotTriNormalWithe2xv2p, 0.0f)) {
-		return worstRes;
+	if (dotTriNormalWithe2xv2p < -ROUNDING_ERROR_f32) {
+		return worstResult;
 	}
 
 	const CRTVector v0v2 = v2 - v0;

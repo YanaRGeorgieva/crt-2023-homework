@@ -118,10 +118,39 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 		returnCol = shade(bestIntersectionPointInfo, shadeNormal, material);
 	} else if (material.type == CRTMaterial::REFLECTIVE) {
 		// Create reflectionRay
-		CRTRay reflectionRay(bestIntersectionPointInfo.p + shadeNormal * SHADOW_BIAS, 
+		CRTRay reflectionRay(bestIntersectionPointInfo.p + shadeNormal * SHADOW_BIAS,
 			ray.direction - 2 * ray.direction.dot(shadeNormal) * shadeNormal);
 		CRTColor reflectionColor = intersectRayWithObjectsInScene(reflectionRay, geometryObjects, depth + 1);
 		returnCol = reflectionColor * material.albedo;
+	} else if (material.type == CRTMaterial::REFRACTIVE) {
+		CRTVector normal = shadeNormal;
+		float currentMaterialIndex{};
+		float newMaterialIndex{};
+		float eta1{};
+		float eta2{};
+		float one80MinusCosAlpha = ray.direction.dot(normal);
+		// Check if the incident ray leaves the transparent object:
+		if (one80MinusCosAlpha > 0) {
+			// Then we need N = -N and swap(eta1, eta2):
+			normal = -1 * normal;
+			float tmp = eta1;
+			eta1 = eta2;
+			eta2 = tmp;
+		}
+		// Compute cosine between I and N (cos(180-alpha) = -cos(alpha)):
+		const float cosAlpha = -one80MinusCosAlpha;
+		// Using Snell's Law find sin(R, -N):
+		const float sinBeta = (sqrtf(1 - cosAlpha * cosAlpha) * eta1) / eta2;
+		// Compute vector R using vector addition:
+		const CRTVector C = (ray.direction + cosAlpha * normal).normalize();
+		const CRTVector B = C * sinBeta;
+		const float cosBeta = sqrtf(1 - sinBeta * sinBeta);
+		const CRTVector A = cosBeta * -1 * normal;
+		const CRTVector Rdirection = A + B;
+		// Construct refractionRay
+		CRTRay refractionRay(intersectionPoint.p, Rdirection);
+		// Trace refractionRay
+		// ....
 	}
 	return returnCol;
 }

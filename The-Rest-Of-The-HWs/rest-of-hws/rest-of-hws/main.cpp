@@ -9,11 +9,5 @@ int main() {
 		CRTImage image = renderer.render();
 		image.writeToPPMFile(name + idx);
 	}
-	renderer.loadCRTScene("a.crtscene");
-	CRTImage image = renderer.render();
-	image.writeToPPMFile("a");
-	renderer.loadCRTScene("a_smooth.crtscene");
-	image = renderer.render();
-	image.writeToPPMFile("a_smooth");
 	return 0;
 }

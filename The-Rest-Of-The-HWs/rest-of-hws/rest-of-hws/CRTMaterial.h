@@ -9,6 +9,7 @@ struct CRTMaterial {
 	enum MaterialTypes {
 		DIFFUSE = 0,
 		REFLECTIVE,
+		REFRACTIVE,
 		UNDEFINED
 	};
 
@@ -24,6 +25,8 @@ struct CRTMaterial {
 			this->type = DIFFUSE;
 		} else if (type == "reflective") {
 			this->type = REFLECTIVE;
+		} else if (type == "refractive") {
+			this->type = REFRACTIVE;
 		} else {
 			this->type = UNDEFINED;
 		}
