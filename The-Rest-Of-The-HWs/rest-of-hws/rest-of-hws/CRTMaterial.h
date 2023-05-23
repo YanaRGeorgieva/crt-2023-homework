@@ -7,10 +7,11 @@
 
 struct CRTMaterial {
 	enum MaterialTypes {
-		DIFFUSE = 0,
-		REFLECTIVE,
-		REFRACTIVE,
-		UNDEFINED
+		diffuse = 0,
+		reflective,
+		refractive,
+		constant,
+		undefined
 	};
 
 	CRTVector albedo;
@@ -22,13 +23,15 @@ struct CRTMaterial {
 		const bool isSmoothShaded = false) :
 		albedo(albedo), isSmoothShaded(isSmoothShaded) {
 		if (type == "diffuse") {
-			this->type = DIFFUSE;
+			this->type = diffuse;
 		} else if (type == "reflective") {
-			this->type = REFLECTIVE;
+			this->type = reflective;
 		} else if (type == "refractive") {
-			this->type = REFRACTIVE;
+			this->type = refractive;
+		} else if (type.empty()) {
+			this->type = constant;
 		} else {
-			this->type = UNDEFINED;
+			this->type = undefined;
 		}
 	};
 };

@@ -34,6 +34,10 @@ const std::vector<CRTTriangle>& CRTMesh::getTriangles() const {
 	return triangles;
 }
 
-const size_t& CRTMesh::getMaterialIdx() const {
-	return materialIdx;
+const CRTMaterial& CRTMesh::getMaterial() const {
+	return material;
+}
+
+void CRTMesh::setMaterial(const std::vector<CRTMaterial>& materials) {
+	material = materials[materialIndex];
 }

@@ -5,17 +5,17 @@
 
 #include "constants.h"
 #include "CRTVector.h"
+#include "CRTMaterial.h"
 #include "CRTTriangle.h"
 
 class CRTMesh {
 	friend class CRTParser;
 public:
-	CRTMesh(const std::vector<CRTVector>& vertices, const std::vector<size_t>& faces, const size_t& materialIdx = 0) {
-		this->vertices.reserve(vertices.size());
+	CRTMesh(const std::vector<CRTVector>& vertices, const std::vector<size_t>& faces, const size_t& materialIndex = 0) {
 		this->faces.reserve(faces.size());
 		this->vertices = vertices;
 		this->faces = faces;
-		this->materialIdx = materialIdx;
+		this->materialIndex = materialIndex;
 	}
 
 	void generateGeometry();
@@ -23,7 +23,8 @@ public:
 	const std::vector<size_t>& getFaces() const;
 	const std::vector<CRTVector>& getVertexNormals() const;
 	const std::vector<CRTTriangle>& getTriangles() const;
-	const size_t& getMaterialIdx() const;
+	const CRTMaterial& getMaterial() const;
+	void setMaterial(const std::vector<CRTMaterial>& materials);
 
 private:
 	std::vector<CRTVector> vertices;
@@ -32,7 +33,8 @@ private:
 	std::vector<CRTVector> vertexNormals;
 	std::vector<CRTTriangle> triangles;
 
-	size_t materialIdx;
+	size_t materialIndex;
+	CRTMaterial material;
 };
 
 #endif // !CRTMESH_H

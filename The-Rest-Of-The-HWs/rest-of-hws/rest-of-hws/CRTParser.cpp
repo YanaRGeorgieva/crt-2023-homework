@@ -133,8 +133,6 @@ std::vector<CRTMesh> CRTParser::loadObjects() const {
 			assert(!materialIndexVal.IsNull() && materialIndexVal.IsUint());
 
 			geometryObjects.emplace_back(loadArrayOfVectors(verticesVal.GetArray()), loadArrayOfUInts(trianglesVal.GetArray()), materialIndexVal.GetUint());
-
-			geometryObjects[i].generateGeometry();
 		}
 	}
 	return geometryObjects;

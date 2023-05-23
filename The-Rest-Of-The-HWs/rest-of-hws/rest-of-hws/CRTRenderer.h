@@ -15,6 +15,7 @@
 #include "CRTMaterial.h"
 #include "CRTTriangle.h"
 #include "CRTRGBColor.h"
+#include "CRTIntersectionData.h"
 
 class CRTRenderer {
 public:
@@ -33,55 +34,33 @@ public:
 	//bool exportCRTScene(const std::string& sceneFilename) const;
 
 private:
-	struct InformationIntersectionPoint {
-		size_t idxGeometry;
-		size_t idxTriangle;
-		CRTVector p;
-		float t;
-		CRTVector triN;
-		CRTColor hitNormal;
-		CRTColor barycentricCoordinates;
-		bool isValid;
-		size_t materialIndex;
 
-		void set(const size_t& idxGeometryObject,
-			const size_t& idxTriangleI,
-			const CRTTriangle& triangle,
-			const CRTTriangle::retDataFromTriIntersect intersectData,
-			const CRTMesh& geometryObject,
-			const std::vector<CRTVector>& vertexNormals,
-			const std::vector<size_t>& faces
-		) {
-			idxGeometry = idxGeometryObject;
-			idxTriangle = idxTriangleI;
-			p = intersectData.p;
-			t = intersectData.t;
-			triN = triangle.getFaceNormal();
-			const size_t idx = idxTriangleI * 3;
-			hitNormal =
-				(vertexNormals[faces[idx + 1]] * intersectData.barycentricCoordinates.x +
-					vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
-					vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
-			barycentricCoordinates = intersectData.barycentricCoordinates;
-			isValid = true;
-			materialIndex = geometryObject.getMaterialIdx();
-		}
-	};
-
-	InformationIntersectionPoint intersectRayWithAnObject(const CRTRay& ray,
+	CRTIntersectionData intersectRayWithAnObject(const CRTRay& ray,
 		const size_t idxGeometryObject,
 		const CRTMesh& geometryObject,
 		float& bestT) const;
+
 	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray,
-		const std::vector<CRTMesh>& geometryObjects,
-		int depth = 0) const;
+		const std::vector<CRTMesh>& geometryObjects) const;
+
 	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray,
 		const std::vector<CRTMesh>& geometryObjects,
 		const float thresholdPminusLight) const;
 
-	CRTColor shade(const InformationIntersectionPoint& bestIntersectionPoint,
-		const CRTVector& shadeNormal,
-		const CRTMaterial& material) const;
+	CRTColor shadeRefractive(const CRTRay& ray,
+		const CRTIntersectionData& bestIntersectionPoint) const;
+
+	CRTColor shadeReflective(const CRTRay& ray,
+		const CRTIntersectionData& bestIntersectionPoint) const;
+
+	CRTColor shadeConstant(const CRTRay& ray,
+		const CRTIntersectionData& bestIntersectionPoint) const;
+
+	CRTColor shadeDiffuse(const CRTRay& ray,
+		const CRTIntersectionData& bestIntersectionPoint) const;
+
+	CRTColor shade(const CRTRay & ray, 
+		const CRTIntersectionData& bestIntersectionPoint) const;
 
 	void processSubimage(CRTImage& subImage) const;
 
