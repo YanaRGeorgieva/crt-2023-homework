@@ -15,13 +15,15 @@ struct CRTMaterial {
 	};
 
 	CRTVector albedo;
+	float ior;
 	MaterialTypes type;
 	bool isSmoothShaded;
 
 	CRTMaterial(const CRTVector& albedo = CRTVector(1.0f),
 		const std::string& type = "diffuse",
-		const bool isSmoothShaded = false) :
-		albedo(albedo), isSmoothShaded(isSmoothShaded) {
+		const bool isSmoothShaded = false,
+		const float& ior = 0.0f) :
+		albedo(albedo), isSmoothShaded(isSmoothShaded), ior(ior) {
 		if (type == "diffuse") {
 			this->type = diffuse;
 		} else if (type == "reflective") {

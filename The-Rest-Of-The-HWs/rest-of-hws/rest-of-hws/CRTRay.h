@@ -7,7 +7,7 @@ enum class RayType {
 	invaid,
 	camera, ///< Ray shot from camera
 	shadow, ///< When shading diffuse material
-	reflection, ///< Aftre reflective material is hit
+	reflective, ///< Aftre reflective material is hit
 	refractive ///< After refractive material is hit
 };
 

@@ -35,6 +35,7 @@ public:
 
 private:
 
+	float currentIOR = 1.0f;
 	CRTIntersectionData intersectRayWithAnObject(const CRTRay& ray,
 		const size_t idxGeometryObject,
 		const CRTMesh& geometryObject,
@@ -47,6 +48,10 @@ private:
 		const std::vector<CRTMesh>& geometryObjects,
 		const float thresholdPminusLight) const;
 
+	bool intersectSceneReducedRange(const CRTRay& ray,
+		const float thresholdPminusLight,
+		CRTColor& shadowColor) const;
+
 	CRTColor shadeRefractive(const CRTRay& ray,
 		const CRTIntersectionData& bestIntersectionPoint) const;
 
@@ -57,9 +62,10 @@ private:
 		const CRTIntersectionData& bestIntersectionPoint) const;
 
 	CRTColor shadeDiffuse(const CRTRay& ray,
-		const CRTIntersectionData& bestIntersectionPoint) const;
+		const CRTIntersectionData& bestIntersectionPoint,
+		const bool hasShadow = true) const;
 
-	CRTColor shade(const CRTRay & ray, 
+	CRTColor shade(const CRTRay& ray,
 		const CRTIntersectionData& bestIntersectionPoint) const;
 
 	void processSubimage(CRTImage& subImage) const;

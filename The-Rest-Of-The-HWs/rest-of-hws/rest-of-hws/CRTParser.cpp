@@ -97,7 +97,7 @@ void CRTParser::loadSettingsAndCamera(CRTCamera& camera, CRTSettings& settings) 
 			const rapidjson::Value& imageWidthVal = imageSettingsVal.FindMember(crtSceneImageWidth)->value;
 			const rapidjson::Value& imageHeightVal = imageSettingsVal.FindMember(crtSceneImageHeight)->value;
 			assert(!imageWidthVal.IsNull() && imageWidthVal.IsInt()
-				   && !imageHeightVal.IsNull() && imageHeightVal.IsInt());
+				&& !imageHeightVal.IsNull() && imageHeightVal.IsInt());
 			settings.fillImageSettings(imageWidthVal.GetInt(), imageHeightVal.GetInt());
 			camera.updateImageSettings(settings.imageSettings);
 		}
@@ -169,13 +169,24 @@ std::vector<CRTMaterial> CRTParser::loadMaterials() const {
 			const rapidjson::Value& materialTypeVal = arr[i][crtSceneMaterialType];
 			assert(!materialTypeVal.IsNull() && materialTypeVal.IsString());
 
-			const rapidjson::Value& materialAlbedoVal = arr[i][crtSceneMaterialAlbedo];
-			assert(!materialAlbedoVal.IsNull() && materialAlbedoVal.IsArray());
+			const rapidjson::Value* materialAlbedoVal = NULL;
+			const rapidjson::Value::ConstMemberIterator materialAlbedoItr = arr[i].FindMember(crtSceneMaterialAlbedo);
+			if (materialAlbedoItr != arr[i].MemberEnd()) {
+				materialAlbedoVal = &arr[i][crtSceneMaterialAlbedo];
+				assert(!materialAlbedoVal->IsNull() && materialAlbedoVal->IsArray());
+			}
+
+			const rapidjson::Value* materialIorVal = NULL;
+			const rapidjson::Value::ConstMemberIterator materialIorItr = arr[i].FindMember(crtSceneMaterialIor);
+			if (materialIorItr != arr[i].MemberEnd()) {
+				materialIorVal = &arr[i][crtSceneMaterialIor];
+				assert(!materialIorVal->IsNull() && materialIorVal->IsDouble());
+			}
 
 			const rapidjson::Value& materialIsSmoothShaded = arr[i][crtSceneMaterialIsSmoothShaded];
 			assert(!materialIsSmoothShaded.IsNull() && materialIsSmoothShaded.IsBool());
 
-			materials.emplace_back(loadVector(materialAlbedoVal.GetArray()), materialTypeVal.GetString(), materialIsSmoothShaded.GetBool());
+			materials.emplace_back(materialAlbedoVal ? loadVector(materialAlbedoVal->GetArray()) : CRTVector(1.0f), materialTypeVal.GetString(), materialIsSmoothShaded.GetBool(), materialIorVal ? materialIorVal->GetDouble() : 0.0f);
 		}
 	}
 	return materials;

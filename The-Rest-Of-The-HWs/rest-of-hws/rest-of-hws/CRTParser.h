@@ -38,6 +38,7 @@ static const char* crtSceneLightsIntensity = "intensity";
 static const char* crtSceneMaterials = "materials";
 static const char* crtSceneMaterialType = "type";
 static const char* crtSceneMaterialAlbedo = "albedo";
+static const char* crtSceneMaterialIor = "ior";
 static const char* crtSceneMaterialIsSmoothShaded = "smooth_shading";
 
 class CRTParser {
