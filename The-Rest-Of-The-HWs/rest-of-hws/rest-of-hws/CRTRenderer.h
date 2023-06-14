@@ -26,7 +26,7 @@ public:
 	CRTRenderer(const CRTRenderer&) = delete;
 	CRTRenderer& operator=(const CRTRenderer&) = delete;
 
-	CRTImage render(const int maxNumberOfBuckets = 64) const;
+	CRTImage render() const;
 	CRTColor intersectScene(const CRTRay& ray) const;
 
 	void loadCRTScene(const std::string& sceneFilename);

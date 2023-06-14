@@ -96,9 +96,11 @@ void CRTParser::loadSettingsAndCamera(CRTCamera& camera, CRTSettings& settings) 
 		if (!imageSettingsVal.IsNull() && imageSettingsVal.IsObject()) {
 			const rapidjson::Value& imageWidthVal = imageSettingsVal.FindMember(crtSceneImageWidth)->value;
 			const rapidjson::Value& imageHeightVal = imageSettingsVal.FindMember(crtSceneImageHeight)->value;
+			const rapidjson::Value& imageBucketSizeVal = imageSettingsVal.FindMember(crtSceneBucketSize)->value;
 			assert(!imageWidthVal.IsNull() && imageWidthVal.IsInt()
-				&& !imageHeightVal.IsNull() && imageHeightVal.IsInt());
-			settings.fillImageSettings(imageWidthVal.GetInt(), imageHeightVal.GetInt());
+				&& !imageHeightVal.IsNull() && imageHeightVal.IsInt()
+				&& !imageBucketSizeVal.IsNull() && imageBucketSizeVal.IsInt());
+			settings.fillImageSettings(imageWidthVal.GetInt(), imageHeightVal.GetInt(), imageBucketSizeVal.GetInt());
 			camera.updateImageSettings(settings.imageSettings);
 		}
 	}

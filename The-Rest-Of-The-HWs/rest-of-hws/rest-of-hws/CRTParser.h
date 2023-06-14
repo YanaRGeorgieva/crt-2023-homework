@@ -21,6 +21,7 @@ static const char* crtSceneBGColor = "background_color";
 static const char* crtSceneImageSettings = "image_settings";
 static const char* crtSceneImageWidth = "width";
 static const char* crtSceneImageHeight = "height";
+static const char* crtSceneBucketSize = "bucket_size";
 
 static const char* crtSceneCamera = "camera";
 static const char* crtSceneCameraMatrix = "matrix";

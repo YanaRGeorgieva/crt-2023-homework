@@ -11,18 +11,19 @@ public:
 
 	CRTSettings() : bgColor(zeroVector) { }
 
-	CRTSettings(const CRTVector& bgColor, const int imageWidth, const int imageHeight) :
+	CRTSettings(const CRTVector& bgColor, const int imageWidth = 1920, const int imageHeight = 1200, const int bucketSize = 24) :
 		bgColor(bgColor),
-		imageSettings(imageWidth, imageHeight) { }
+		imageSettings(imageWidth, imageHeight, bucketSize) { }
 
 	void setBGColor(const CRTVector& bgColor);
-	void fillImageSettings(const int imageWidth, const int imageHeight);
-	void fillImageSettings(const CRTVector& bgColor, const int imageWidth, const int imageHeight);
+	void fillImageSettings(const int imageWidth, const int imageHeight, const int bucketSize = 24);
+	void fillImageSettings(const CRTVector& bgColor, const int imageWidth, const int imageHeight, const int bucketSize = 24);
 
 	int getImageHeight() const;
 	int getImageWidth() const;
 	float getImageAspectRatio() const;
 	CRTVector getBGColor() const;
+	int getImageBucketSize() const;
 
 private:
 	CRTVector bgColor;

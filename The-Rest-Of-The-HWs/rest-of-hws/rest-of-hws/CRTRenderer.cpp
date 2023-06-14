@@ -4,33 +4,28 @@ CRTColor CRTRenderer::intersectScene(const CRTRay& ray) const {
 	return intersectRayWithObjectsInScene(ray, scene->getGeometryObjects());
 }
 
-CRTImage CRTRenderer::render(const int maxNumberOfBuckets) const {
+CRTImage CRTRenderer::render() const {
 	const int imageWidth = scene->getSettings().getImageWidth();
 	const int imageHeight = scene->getSettings().getImageHeight();
+	const int imageBucketSize = scene->getSettings().getImageBucketSize();
 
-	const int sqrtNumBuckets = (int)sqrt(maxNumberOfBuckets);
-
-	const int subWidth = imageWidth / sqrtNumBuckets;
-	const int subHeight = imageHeight / sqrtNumBuckets;
-
-	const int numHorizontal = imageWidth / subWidth;
-	const int numVertical = imageHeight / subHeight;
+	const int numHorizontal = imageWidth / imageBucketSize;
+	const int numVertical = imageHeight / imageBucketSize;
 
 	CRTImage image(imageWidth, imageHeight);
 	std::vector<CRTImage> subImages;
-	subImages.reserve(maxNumberOfBuckets);
 
 	for (size_t i = 0; i < numVertical; i++) {
 		for (size_t j = 0; j < numHorizontal; j++) {
 			// Calculate the top-left and bottom-right pixel coordinates for this sub-image
-			size_t top = i * subHeight;
-			size_t realHeight = subHeight;
-			if (top + subHeight > imageHeight) {
+			size_t top = i * imageBucketSize;
+			size_t realHeight = imageBucketSize;
+			if (top + imageBucketSize > imageHeight) {
 				realHeight = imageHeight - top;
 			}
-			size_t left = j * subWidth;
-			size_t realWidth = subWidth;
-			if (left + subWidth > imageWidth) {
+			size_t left = j * imageBucketSize;
+			size_t realWidth = imageBucketSize;
+			if (left + imageBucketSize > imageWidth) {
 				realWidth = imageWidth - left;
 			}
 			CRTImage subImage(realWidth, realHeight, left, top);
@@ -65,6 +60,8 @@ CRTImage CRTRenderer::render(const int maxNumberOfBuckets) const {
 		}
 	}
 
+	//CRTImage image(imageWidth, imageHeight);
+	//processSubimage(image);
 	return image;
 }
 
