@@ -39,10 +39,16 @@ CRTImage CRTRenderer::render(const int maxNumberOfBuckets) const {
 	}
 
 	const int length = numVertical * numHorizontal;
-#pragma omp parallel for
-	for (int i = 0; i < length; i++) {
-		processSubimage(subImages[i]);
-	}
+
+	std::for_each(
+		std::execution::par,
+		subImages.begin(),
+		subImages.end(),
+		[&](CRTImage& bucket) {
+			processSubimage(bucket);
+		}
+	);
+
 
 	// At each pixel :
 	for (size_t i = 0; i < length; i++) {
@@ -94,7 +100,7 @@ CRTIntersectionData CRTRenderer::intersectRayWithAnObject(const CRTRay& ray,
 	const size_t len = triangles.size();
 	for (size_t i = 0; i < len; i++) {
 		const CRTTriangle& tri = triangles[i];
-		const CRTTriangle::retDataFromTriIntersect& intersectData = tri.intersect(ray, bestT);
+		const CRTTriangle::retDataFromTriangleIntersect& intersectData = tri.intersect(ray, bestT);
 		//	If P is on the left of the 3 edges and t > 0, we have an intersection
 		if (bestT > intersectData.t) {
 			// Get closest p (with least length)
@@ -284,12 +290,15 @@ bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray,
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
 		const std::vector<CRTTriangle>& triangles = geometryObjects[i].getTriangles();
-		const size_t len = triangles.size();
-		for (size_t i = 0; i < len; i++) {
-			const CRTTriangle::retDataFromTriIntersect& intersectData =
-				triangles[i].intersect(ray, thresholdPminusLight);
+		const size_t lenTri = triangles.size();
+		for (size_t j = 0; j < lenTri; j++) {
+			const CRTTriangle::retDataFromTriangleIntersect& intersectData =
+				triangles[j].intersect(ray, thresholdPminusLight);
 			//	If P is on the left of the 3 edges and t > 0, we have an intersection
 			if (thresholdPminusLight > intersectData.t) {
+				if (geometryObjects[i].getMaterial().type == CRTMaterial::refractive) {
+					continue;
+				}
 				return true;
 			}
 		}

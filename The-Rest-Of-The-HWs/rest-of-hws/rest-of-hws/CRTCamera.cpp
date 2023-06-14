@@ -43,12 +43,12 @@ void CRTCamera::dolly(const CRTVector& moveDir) {
 }
 
 void CRTCamera::tilt(const float degs) {
-	const CRTMatrix xRotation = makeRotationCRTMatrixX(degs);
+	const CRTMatrix xRotation = makeRotationCRTMatrixX(fminf(fmaxf(degs, -90.0f), 90.0f));
 	rotation = rotation * xRotation;
 }
 
 void CRTCamera::pan(const float degs) {
-	const CRTMatrix yRotation = makeRotationCRTMatrixY(degs);
+	const CRTMatrix yRotation = makeRotationCRTMatrixY(fminf(fmaxf(degs, ROUNDING_ERROR_f32), 180.0f - ROUNDING_ERROR_f32));
 	rotation = rotation * yRotation;
 }
 

@@ -25,10 +25,10 @@ public:
 	// A dolly shot moves the camera towards or away from the subject.
 	void dolly(const CRTVector& moveDir);
 
-	// Tilt camera movements direct a camera upward or downward.
+	// Tilt camera movements direct a camera upward or downward. Clamped in [-90, 90].
 	void tilt(const float degs);
 
-	// The camera pan directs a camera horizontally left or right.
+	// The camera pan directs a camera horizontally left or right. Clamped in (0, 180).
 	void pan(const float degs);
 
 	// The camera roll is a rotational camera movement that rotates the camera over its side on its long axis.

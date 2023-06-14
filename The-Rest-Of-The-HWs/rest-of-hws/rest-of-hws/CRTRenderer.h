@@ -2,9 +2,8 @@
 #define CRTRENDERER_H
 
 #include <vector>
-#include <string>
-
-#include <omp.h>
+#include <algorithm>
+#include <execution>
 
 #include "CRTRay.h"
 #include "CRTMesh.h"
@@ -47,10 +46,6 @@ private:
 	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray,
 		const std::vector<CRTMesh>& geometryObjects,
 		const float thresholdPminusLight) const;
-
-	bool intersectSceneReducedRange(const CRTRay& ray,
-		const float thresholdPminusLight,
-		CRTColor& shadowColor) const;
 
 	CRTColor shadeRefractive(const CRTRay& ray,
 		const CRTIntersectionData& bestIntersectionPoint) const;

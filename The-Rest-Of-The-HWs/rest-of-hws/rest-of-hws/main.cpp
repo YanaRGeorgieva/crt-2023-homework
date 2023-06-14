@@ -9,5 +9,8 @@ int main() {
 		CRTImage image = renderer.render();
 		image.writeToPPMFile(name + idx);
 	}
+	renderer.loadCRTScene("testArtefacts.crtscene");
+	CRTImage image = renderer.render();
+	image.writeToPPMFile("testArtefacts");
 	return 0;
 }

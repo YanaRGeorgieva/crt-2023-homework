@@ -20,7 +20,7 @@ struct CRTIntersectionData {
 	void set(const size_t& idxGeometryObject,
 		const size_t& idxTriangleI,
 		const CRTTriangle& triangle,
-		const CRTTriangle::retDataFromTriIntersect intersectData,
+		const CRTTriangle::retDataFromTriangleIntersect intersectData,
 		const CRTMesh& geometryObject,
 		const std::vector<CRTVector>& vertexNormals,
 		const std::vector<size_t>& faces

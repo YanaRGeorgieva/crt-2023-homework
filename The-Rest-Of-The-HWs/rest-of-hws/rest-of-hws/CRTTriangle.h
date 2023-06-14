@@ -27,13 +27,13 @@ public:
 
 	float getArea() const;
 
-	struct retDataFromTriIntersect {
+	struct retDataFromTriangleIntersect {
 		CRTVector p;
 		CRTVector barycentricCoordinates;
 		float t;
 	};
 
-	retDataFromTriIntersect intersect(const CRTRay& ray, const float thresholdT = std::numeric_limits<float>::max()) const;
+	retDataFromTriangleIntersect intersect(const CRTRay& ray, const float thresholdT = std::numeric_limits<float>::max()) const;
 private:
 	void computeFaceNormal();
 
