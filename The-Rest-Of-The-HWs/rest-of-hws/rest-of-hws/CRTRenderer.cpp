@@ -119,6 +119,17 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
+		const CRTAABB& aabbBox = geometryObjects[i].getBox();
+		if (aabbBox.isValid()) {
+			const retIntersectionBox& data = aabbBox.intersect(ray, bestT);
+			if (data.isValid) {
+				// Do the intersection with the object
+				// bestT = data.t;
+			} else {
+				// Skip the intersection with the object
+				continue;
+			}
+		}
 		intersectionPoint = intersectRayWithAnObject(ray, i, geometryObjects[i], bestT);
 		if (intersectionPoint.isValid) {
 			bestIntersectionPointInfo = intersectionPoint;

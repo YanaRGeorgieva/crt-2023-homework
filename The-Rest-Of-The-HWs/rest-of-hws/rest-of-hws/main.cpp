@@ -20,3 +20,10 @@ int main() {
 	}
 	return 0;
 }
+
+/*
+Reading, rendering and writing of scene0 took 1691.457880 seconds. (Debug, no parallel, no AABB).
+Reading, rendering and writing of scene0 took 149.828921 seconds. (Release, no parallel, no AABB).
+Reading, rendering and writing of scene0 took 18.241563 seconds. (Release, parallel, no AABB).
+Reading, rendering and writing of scene0 took 9.533833 seconds. (Release, parallel, AABB).
+*/

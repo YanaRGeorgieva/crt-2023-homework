@@ -17,6 +17,8 @@ void CRTMesh::generateGeometry() {
 	for (size_t i = 0; i < vertices.size(); i++) {
 		vertexNormals[i] = vertexNormals[i].normalize();
 	}
+
+	calculateAABB();
 }
 const std::vector<CRTVector>& CRTMesh::getVertices() const {
 	return vertices;
@@ -38,6 +40,18 @@ const CRTMaterial& CRTMesh::getMaterial() const {
 	return material;
 }
 
+const CRTAABB& CRTMesh::getBox() const {
+	return box;
+}
+
 void CRTMesh::setMaterial(const std::vector<CRTMaterial>& materials) {
 	material = materials[materialIndex];
+}
+
+void CRTMesh::calculateAABB() {
+	const std::vector<CRTVector>& vertices = getVertices();
+	for (auto& vertex : vertices) {
+		// Expand box with vertex
+		box.expand(vertex);
+	}
 }

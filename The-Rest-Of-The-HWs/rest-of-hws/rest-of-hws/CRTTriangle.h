@@ -8,9 +8,11 @@
 #include "constants.h"
 #include "CRTVector.h"
 
-const int numberOFVertices = 3;
+
 class CRTTriangle {
 public:
+	static const int numberOFVertices = 3;
+
 	CRTTriangle(const CRTVector& x, const CRTVector& y, const CRTVector& z) :v0(x), v1(y), v2(z) {
 		// Generate triangles normal vectors : normalize(cross(E0, E1)) - precomputed 
 		computeFaceNormal();

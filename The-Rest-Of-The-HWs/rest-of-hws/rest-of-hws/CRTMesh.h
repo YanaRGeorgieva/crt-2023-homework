@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "CRTAABB.h"
 #include "constants.h"
 #include "CRTVector.h"
 #include "CRTMaterial.h"
@@ -24,7 +25,9 @@ public:
 	const std::vector<CRTVector>& getVertexNormals() const;
 	const std::vector<CRTTriangle>& getTriangles() const;
 	const CRTMaterial& getMaterial() const;
+	const CRTAABB& getBox() const;
 	void setMaterial(const std::vector<CRTMaterial>& materials);
+	void calculateAABB();
 
 private:
 	std::vector<CRTVector> vertices;
@@ -35,6 +38,8 @@ private:
 
 	size_t materialIndex;
 	CRTMaterial material;
+
+	CRTAABB box;
 };
 
 #endif // !CRTMESH_H

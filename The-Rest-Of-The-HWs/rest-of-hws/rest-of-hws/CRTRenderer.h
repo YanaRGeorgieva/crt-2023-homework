@@ -6,6 +6,7 @@
 #include <execution>
 
 #include "CRTRay.h"
+#include "CRTAABB.h"
 #include "CRTMesh.h"
 #include "CRTColor.h"
 #include "CRTImage.h"
