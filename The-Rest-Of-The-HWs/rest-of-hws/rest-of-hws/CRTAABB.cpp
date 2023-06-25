@@ -1,9 +1,9 @@
 #include "CRTAABB.h"
 
 bool CRTAABB::isValid() const {
-	return boxMax.x - boxMin.x > ROUNDING_ERROR_f32
-		&& boxMax.y - boxMin.y > ROUNDING_ERROR_f32
-		&& boxMax.z - boxMin.z > ROUNDING_ERROR_f32;
+	return boxMax.x - boxMin.x > EPSILON
+		&& boxMax.y - boxMin.y > EPSILON
+		&& boxMax.z - boxMin.z > EPSILON;
 }
 
 void CRTAABB::expand(const CRTVector& vertex) {
@@ -15,15 +15,15 @@ void CRTAABB::expand(const CRTVector& vertex) {
 	boxMax.z = std::fmaxf(boxMax.z, vertex.z);
 }
 
-retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) const {
+retIntersectionBox CRTAABB::intersect(const CRTRay& ray, const float& thresholdT) const {
 	retIntersectionBox returnData;
 	returnData.isValid = false;
 
-	const CRTVector invDirection = CRTVector(1 / ray.direction.x, 1 / ray.direction.y, 1 / ray.direction.z);
+	const CRTVector invDirection = CRTVector(1.0f / ray.direction.x, 1.0f / ray.direction.y, 1.0f / ray.direction.z);
 
 	// Check for intersection on X side
 	float tMinX = (boxMin.x - ray.origin.x) * invDirection.x;
-	if (tMinX > 0 && tMinX < thresholdT) {
+	if (tMinX > -EPSILON && tMinX < thresholdT) {
 		CRTVector pMinX = ray.origin + tMinX * ray.direction;
 		if (pMinX.y >= boxMin.y && pMinX.y <= boxMax.y &&
 			pMinX.z >= boxMin.z && pMinX.z <= boxMax.z) {
@@ -35,7 +35,7 @@ retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) cons
 	}
 
 	float tMaxX = (boxMax.x - ray.origin.x) * invDirection.x;
-	if (tMaxX > 0 && tMaxX < thresholdT) {
+	if (tMaxX > -EPSILON && tMaxX < thresholdT) {
 		CRTVector pMaxX = ray.origin + tMaxX * ray.direction;
 		if (pMaxX.y >= boxMin.y && pMaxX.y <= boxMax.y &&
 			pMaxX.z >= boxMin.z && pMaxX.z <= boxMax.z) {
@@ -48,7 +48,7 @@ retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) cons
 
 	// Check for intersection on Y side
 	float tMinY = (boxMin.y - ray.origin.y) * invDirection.y;
-	if (tMinY > 0 && tMinY < thresholdT) {
+	if (tMinY > -EPSILON && tMinY < thresholdT) {
 		CRTVector pMinY = ray.origin + tMinY * ray.direction;
 		if (pMinY.x >= boxMin.x && pMinY.x <= boxMax.x &&
 			pMinY.z >= boxMin.z && pMinY.z <= boxMax.z) {
@@ -60,7 +60,7 @@ retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) cons
 	}
 
 	float tMaxY = (boxMax.y - ray.origin.y) * invDirection.y;
-	if (tMaxY > 0 && tMaxY < thresholdT) {
+	if (tMaxY > -EPSILON && tMaxY < thresholdT) {
 		CRTVector pMaxY = ray.origin + tMaxY * ray.direction;
 		if (pMaxY.x >= boxMin.x && pMaxY.x <= boxMax.x &&
 			pMaxY.z >= boxMin.z && pMaxY.z <= boxMax.z) {
@@ -73,7 +73,7 @@ retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) cons
 
 	// Check for intersection on Z side
 	float tMinZ = (boxMin.z - ray.origin.z) * invDirection.z;
-	if (tMinZ > 0 && tMinZ < thresholdT) {
+	if (tMinZ > -EPSILON && tMinZ < thresholdT) {
 		CRTVector pMinZ = ray.origin + tMinZ * ray.direction;
 		if (pMinZ.x >= boxMin.x && pMinZ.x <= boxMax.x &&
 			pMinZ.y >= boxMin.y && pMinZ.y <= boxMax.y) {
@@ -85,7 +85,7 @@ retIntersectionBox CRTAABB::intersect(const CRTRay& ray, float& thresholdT) cons
 	}
 
 	float tMaxZ = (boxMax.z - ray.origin.z) * invDirection.z;
-	if (tMaxZ > 0 && tMaxZ < thresholdT) {
+	if (tMaxZ > -EPSILON && tMaxZ < thresholdT) {
 		CRTVector pMaxZ = ray.origin + tMaxZ * ray.direction;
 		if (pMaxZ.x >= boxMin.x && pMaxZ.x <= boxMax.x &&
 			pMaxZ.y >= boxMin.y && pMaxZ.y <= boxMax.y) {

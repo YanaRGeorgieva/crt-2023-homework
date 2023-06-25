@@ -15,13 +15,13 @@ struct retIntersectionBox {
 
 class CRTAABB {
 public:
-	CRTAABB(const CRTVector& boxMin = CRTVector(std::numeric_limits<float>::max()),
-		const CRTVector& boxMax = CRTVector(std::numeric_limits<float>::min())) :
+	CRTAABB(const CRTVector& boxMin = CRTVector(maxFloat),
+		const CRTVector& boxMax = CRTVector(minFloat)) :
 		boxMin(boxMin), boxMax(boxMax) {}
 
 	bool isValid() const;
 	void expand(const CRTVector& vertex);
-	retIntersectionBox intersect(const CRTRay& ray, float& thresholdT) const;
+	retIntersectionBox intersect(const CRTRay& ray, const float& thresholdT) const;
 private:
 	CRTVector boxMin, boxMax;
 };

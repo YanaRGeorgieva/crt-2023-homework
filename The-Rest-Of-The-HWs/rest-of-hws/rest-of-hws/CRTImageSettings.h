@@ -9,7 +9,7 @@ struct ImageSettings {
 	int bucketSize;
 	float aspectRatio;
 
-	ImageSettings(const int imageWidth = 1280, const int imageHeight = 720, const int bucketSize = 24) :
+	ImageSettings(const int imageWidth = 1920, const int imageHeight = 1200, const int bucketSize = 24) :
 		imageWidth(imageWidth),
 		imageHeight(imageHeight),
 		bucketSize(bucketSize),

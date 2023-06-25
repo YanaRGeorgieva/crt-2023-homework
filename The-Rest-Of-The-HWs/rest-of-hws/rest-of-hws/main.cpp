@@ -7,7 +7,7 @@
 int main() {
 	CRTRenderer renderer;
 	std::string name = "scene";
-	for (size_t i = 0; i < 1; i++) {
+	for (size_t i = 2; i < 3; i++) {
 		std::string idx = std::to_string(i);
 		std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
 		renderer.loadCRTScene(name + idx + ".crtscene");

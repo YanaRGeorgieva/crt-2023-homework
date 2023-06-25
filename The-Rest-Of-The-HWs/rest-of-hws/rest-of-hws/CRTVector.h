@@ -2,18 +2,17 @@
 #define CRTVECTOR_H
 
 #include <cmath>
-#include <limits>
 
 #include "constants.h"
 
 struct CRTVector {
 	float x, y, z;
 
-	CRTVector() : x(), y(), z() { }
+	CRTVector() : x(0.0f), y(0.0f), z(0.0f) { }
 
-	CRTVector(float num) : x(num), y(num), z(num) { }
+	CRTVector(const float num) : x(num), y(num), z(num) { }
 
-	CRTVector(float x, float y, float z) : x(x), y(y), z(z) { }
+	CRTVector(const float x, const float y, const float z) : x(x), y(y), z(z) { }
 
 	float& operator [](const int idx) {
 		return (&x)[idx];
@@ -27,7 +26,7 @@ struct CRTVector {
 
 	CRTVector normalize() const;
 
-	void setComponents(float x, float y, float z);
+	void setComponents(const float x, const float y, const float z);
 
 	CRTVector operator+ (const CRTVector& rhs) const;
 	void operator+= (const CRTVector& rhs);
@@ -50,13 +49,10 @@ struct CRTVector {
 	CRTVector operator/ (const int scalar) const;
 };
 
-const CRTVector worstP{
-		std::numeric_limits<float>::max(),
-		std::numeric_limits<float>::max() ,
-		std::numeric_limits<float>::max() };
+const CRTVector worstP(maxFloat);
 
-const CRTVector zeroVector{ 0.0f, 0.0f, 0.0f };
-const CRTVector identityVector{ 1.0f, 1.0f, 1.0f };
+const CRTVector zeroVector(0.0f);
+const CRTVector identityVector(1.0f);
 
 CRTVector operator* (const int scalar, const CRTVector& rhs);
 CRTVector operator* (const float scalar, const CRTVector& rhs);

@@ -33,9 +33,10 @@ public:
 		CRTVector p;
 		CRTVector barycentricCoordinates;
 		float t;
+		bool isValid;
 	};
 
-	retDataFromTriangleIntersect intersect(const CRTRay& ray, const float thresholdT = std::numeric_limits<float>::max()) const;
+	retDataFromTriangleIntersect intersect(const CRTRay& ray, const float thresholdT = 1e30f, const bool backface = true) const;
 private:
 	void computeFaceNormal();
 

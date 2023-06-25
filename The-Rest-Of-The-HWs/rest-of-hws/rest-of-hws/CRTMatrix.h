@@ -12,9 +12,9 @@ struct CRTMatrix {
 
 	CRTMatrix(void) { }
 
-	CRTMatrix(const float value) : v0(value, 0, 0), v1(0, value, 0), v2(0, 0, value) { }
+	CRTMatrix(const float value) : v0(value, 0.0f, 0.0f), v1(0.0f, value, 0.0f), v2(0.0f, 0.0f, value) { }
 
-	CRTMatrix(const CRTVector& diagonal) : v0(diagonal.x, 0, 0), v1(0, diagonal.y, 0), v2(0, 0, diagonal.z) { }
+	CRTMatrix(const CRTVector& diagonal) : v0(diagonal.x, 0.0f, 0.0f), v1(0.0f, diagonal.y, 0.0f), v2(0.0f, 0.0f, diagonal.z) { }
 
 	CRTMatrix(const CRTVector& a, const CRTVector& b, const CRTVector& c) : v0(a), v1(b), v2(c) { }
 
@@ -44,10 +44,12 @@ struct CRTMatrix {
 
 	CRTMatrix operator *(const CRTMatrix& rhs) const;
 
+	static float determinant(const CRTVector& a, const CRTVector& b, const CRTVector& c);
+
 };
 
-static const CRTMatrix identityMatrix = CRTMatrix(1.0f);
-static const CRTMatrix zeroMatrix = CRTMatrix(0.0f);
+const CRTMatrix identityMatrix = CRTMatrix(1.0f);
+const CRTMatrix zeroMatrix = CRTMatrix(0.0f);
 
 CRTVector operator *(const CRTVector& a, const CRTMatrix& m);
 

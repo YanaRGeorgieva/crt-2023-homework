@@ -20,8 +20,7 @@ CRTMatrix CRTMatrix::CRTMatrix::transpose() const {
 }
 
 CRTMatrix CRTMatrix::negate() const {
-	return CRTMatrix(-1 * v0, -1 * v1, -1 * v2);
-
+	return CRTMatrix(-1.0f * v0, -1.0f * v1, -1.0f * v2);
 }
 
 CRTMatrix CRTMatrix::operator +(const CRTMatrix& rhs) const {
@@ -59,11 +58,11 @@ CRTVector operator *(const CRTMatrix& m, const CRTVector& a) {
 }
 
 CRTMatrix operator *(const CRTMatrix& m, const int x) {
-	return CRTMatrix(m.v0 * x, m.v1 * x, m.v2 * x);
+	return CRTMatrix(m.v0 * (float)x, m.v1 * (float)x, m.v2 * (float)x);
 }
 
 CRTMatrix operator *(const int x, const CRTMatrix& m) {
-	return CRTMatrix(x * m.v0, x * m.v1, x * m.v2);
+	return CRTMatrix((float)x * m.v0, (float)x * m.v1, (float)x * m.v2);
 }
 
 CRTMatrix operator *(const CRTMatrix& m, const float x) {
@@ -75,30 +74,34 @@ CRTMatrix operator *(const float x, const CRTMatrix& m) {
 }
 
 CRTMatrix operator *(const CRTMatrix& m, const double& x) {
-	return CRTMatrix(m.v0 * x, m.v1 * x, m.v2 * x);
+	return CRTMatrix(m.v0 * (float)x, m.v1 * (float)x, m.v2 * (float)x);
 }
 
 CRTMatrix operator *(const double& x, const CRTMatrix& m) {
-	return CRTMatrix(x * m.v0, x * m.v1, x * m.v2);
+	return CRTMatrix((float)x * m.v0, (float)x * m.v1, (float)x * m.v2);
 }
 
 CRTMatrix makeRotationCRTMatrixX(const float xangle) {
-	const float xrot = (float)xangle * ((float)M_PI / 180.0f);
+	const float xrot = xangle * ((float)M_PI / 180.0f);
 	const float s = sin(xrot);
 	const float c = cos(xrot);
-	return CRTMatrix(CRTVector(1.0f, 0.0f, 0.0f), CRTVector(0, c, s), CRTVector(0, -s, c));
+	return CRTMatrix(CRTVector(1.0f, 0.0f, 0.0f), CRTVector(0.0f, c, s), CRTVector(0.0f, -s, c));
 }
 
 CRTMatrix makeRotationCRTMatrixY(const float yangle) {
-	const float yrot = (float)yangle * ((float)M_PI / 180.0f);
+	const float yrot = yangle * ((float)M_PI / 180.0f);
 	const float s = sin(yrot);
 	const float c = cos(yrot);
-	return CRTMatrix(CRTVector(c, 0, -s), CRTVector(0.0f, 1.0f, 0.0f), CRTVector(s, 0, c));
+	return CRTMatrix(CRTVector(c, 0.0f, -s), CRTVector(0.0f, 1.0f, 0.0f), CRTVector(s, 0.0f, c));
 }
 
 CRTMatrix makeRotationCRTMatrixZ(const float zangle) {
-	const float zrot = (float)zangle * ((float)M_PI / 180.0f);
+	const float zrot = zangle * ((float)M_PI / 180.0f);
 	const float s = sin(zrot);
 	const float c = cos(zrot);
-	return CRTMatrix(CRTVector(c, s, 0), CRTVector(-s, c, 0), CRTVector(0.0f, 0.0f, 1.0f));
+	return CRTMatrix(CRTVector(c, s, 0.0f), CRTVector(-s, c, 0.0f), CRTVector(0.0f, 0.0f, 1.0f));
+}
+
+float CRTMatrix::determinant(const CRTVector& a, const CRTVector& b, const CRTVector& c) {
+	return a.cross(b).dot(c);
 }

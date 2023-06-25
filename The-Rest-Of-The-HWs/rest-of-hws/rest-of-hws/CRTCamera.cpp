@@ -25,19 +25,19 @@ void CRTCamera::updateImageSettings(const ImageSettings& settings) {
 }
 
 void CRTCamera::truck(const CRTVector& moveDir) {
-	CRTVector moveDirWorldSpace = moveDir * CRTVector(-1, 0, 0);
+	CRTVector moveDirWorldSpace = moveDir * CRTVector(-1.0f, 0.0f, 0.0f);
 	moveDirWorldSpace = moveDirWorldSpace * rotation;
 	position = position + moveDirWorldSpace;
 }
 
 void CRTCamera::boom(const CRTVector& moveDir) {
-	CRTVector moveDirWorldSpace = moveDir * CRTVector(0, -1, 0);
+	CRTVector moveDirWorldSpace = moveDir * CRTVector(0.0f, -1.0f, 0.0f);
 	moveDirWorldSpace = moveDirWorldSpace * rotation;
 	position = position + moveDirWorldSpace;
 }
 
 void CRTCamera::dolly(const CRTVector& moveDir) {
-	CRTVector moveDirWorldSpace = moveDir * CRTVector(0, 0, 1);
+	CRTVector moveDirWorldSpace = moveDir * CRTVector(0.0f, 0.0f, 1.0f);
 	moveDirWorldSpace = moveDirWorldSpace * rotation;
 	position = position + moveDirWorldSpace;
 }
@@ -48,7 +48,7 @@ void CRTCamera::tilt(const float degs) {
 }
 
 void CRTCamera::pan(const float degs) {
-	const CRTMatrix yRotation = makeRotationCRTMatrixY(fminf(fmaxf(degs, ROUNDING_ERROR_f32), 180.0f - ROUNDING_ERROR_f32));
+	const CRTMatrix yRotation = makeRotationCRTMatrixY(fminf(fmaxf(degs, EPSILON), 180.0f - EPSILON));
 	rotation = rotation * yRotation;
 }
 
