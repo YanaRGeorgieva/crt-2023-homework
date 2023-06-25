@@ -15,11 +15,11 @@ struct CRTVector {
 	CRTVector(const float x, const float y, const float z) : x(x), y(y), z(z) { }
 
 	float& operator [](const int idx) {
-		return (&x)[idx];
+		return (&x)[idx % 3];
 	}
 
 	const float& operator [](const int idx) const {
-		return (&x)[idx];
+		return (&x)[idx % 3];
 	}
 
 	float length() const;
@@ -49,7 +49,7 @@ struct CRTVector {
 	CRTVector operator/ (const int scalar) const;
 };
 
-const CRTVector worstP(maxFloat);
+const CRTVector worstP(MAX_FLOAT);
 
 const CRTVector zeroVector(0.0f);
 const CRTVector identityVector(1.0f);

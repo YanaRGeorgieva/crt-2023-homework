@@ -1,7 +1,9 @@
 #include "CRTRenderer.h"
 
 CRTColor CRTRenderer::intersectScene(const CRTRay& ray) const {
-	return intersectRayWithObjectsInScene(ray, scene->getGeometryObjects());
+	CRTColor resultColor{};
+	intersectRayWithObjectsInScene(ray, scene->getGeometryObjects(), MAX_FLOAT, resultColor);
+	return resultColor;
 }
 
 CRTImage CRTRenderer::render() const {
@@ -89,45 +91,21 @@ void CRTRenderer::processSubimage(CRTImage& subImage) const {
 	}
 }
 
-CRTIntersectionData CRTRenderer::intersectRayWithAnObject(const CRTRay& ray,
-	const size_t idxGeometryObject,
-	const CRTMesh& geometryObject,
-	float& bestT) const {
-
-	const std::vector<CRTTriangle>& triangles = geometryObject.getTriangles();
-	const std::vector<size_t>& faces = geometryObject.getFaces();
-	const std::vector<CRTVector>& vertexNormals = geometryObject.getVertexNormals();
-
-	CRTIntersectionData intersectionPointInfo{};
-	intersectionPointInfo.isValid = false;
-
-	const size_t len = triangles.size();
-	for (size_t i = 0; i < len; i++) {
-		const CRTTriangle& tri = triangles[i];
-		const CRTTriangle::retDataFromTriangleIntersect& intersectData = tri.intersect(ray, bestT);
-		//	If P is on the left of the 3 edges and t > 0, we have an intersection
-		if (intersectData.isValid) {
-			// Get closest p (with least length)
-			bestT = intersectData.t;
-			intersectionPointInfo.set(idxGeometryObject, i, tri, intersectData, geometryObject, vertexNormals, faces);
-		}
-	}
-	return intersectionPointInfo;
-}
-
-CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
-	const std::vector<CRTMesh>& geometryObjects) const {
+bool CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
+	const std::vector<CRTMesh>& geometryObjects,
+	const float& bestTDefault,
+	CRTColor& col) const {
 
 	CRTIntersectionData intersectionPoint{};
 	CRTIntersectionData bestIntersectionPointInfo{};
 	bestIntersectionPointInfo.isValid = false;
 
-	float bestT{ maxFloat };
+	float bestT{ bestTDefault };
 	//float bestTBox{ maxFloat };
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
-		const CRTAABB& aabbBox = geometryObjects[i].getBox();
+		const CRTBox& aabbBox = geometryObjects[i].getBox();
 		if (aabbBox.isValid()) {
 			const retIntersectionBox& data = aabbBox.intersect(ray, bestT);
 			if (data.isValid) {
@@ -138,13 +116,16 @@ CRTColor CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 				continue;
 			}
 		}
-		intersectionPoint = intersectRayWithAnObject(ray, i, geometryObjects[i], bestT);
+		intersectionPoint = geometryObjects[i].intersect(ray, i, bestT);
 		if (intersectionPoint.isValid) {
+			if (ray.type == RayType::shadow) {
+				return true;
+			}
 			bestIntersectionPointInfo = intersectionPoint;
 		}
 	}
-
-	return shade(ray, bestIntersectionPointInfo);
+	col = shade(ray, bestIntersectionPointInfo);
+	return bestIntersectionPointInfo.isValid;
 }
 
 CRTColor CRTRenderer::shade(const CRTRay& ray,
@@ -194,7 +175,7 @@ CRTColor CRTRenderer::shadeRefractive(const CRTRay& ray,
 	float eta2{ material.ior };
 	float angleBetweenIandN = ray.direction.dot(normal);
 	// Check if the incident ray leaves the transparent object:
-	if (angleBetweenIandN > -EPSILON) {
+	if (greaterThan(angleBetweenIandN, 0.0f)) {
 		// Then we need N = -N and swap(eta1, eta2):
 		normal = -1.0f * normal;
 		float tmp = eta1;
@@ -206,7 +187,7 @@ CRTColor CRTRenderer::shadeRefractive(const CRTRay& ray,
 
 	// If angle(I, N) <  critical angle (sin(I, N) < eta1 / eta2);
 	const float sinAlpha = sqrtf(1.0f - cosAlpha * cosAlpha);
-	if (sinAlpha < eta2 / eta1) {
+	if (lessThan(sinAlpha, eta2 / eta1)) {
 		// Using Snell's Law find sin(R, -N):
 		const float sinBeta = (sinAlpha * eta1) / eta2;
 		// Compute vector R using vector addition:
@@ -217,15 +198,15 @@ CRTColor CRTRenderer::shadeRefractive(const CRTRay& ray,
 		const CRTVector Rdirection = A + B;
 		// Construct refractionRay
 		CRTRay refractionRay(bestIntersectionPoint.p + (-1.0f * normal * REFRACTION_BIAS),
-			Rdirection, 
-			ray.pathDepth + 1, 
+			Rdirection,
+			ray.pathDepth + 1,
 			RayType::refractive);
 		// Trace refractionRay
 		CRTColor refractionColor = intersectScene(refractionRay);
 		// Construct reflectionRay
 		CRTRay reflectionRay(bestIntersectionPoint.p + normal * REFLECTION_BIAS,
-			ray.direction - 2.0f * ray.direction.dot(normal) * normal, 
-			ray.pathDepth + 1, 
+			ray.direction - 2.0f * ray.direction.dot(normal) * normal,
+			ray.pathDepth + 1,
 			RayType::reflective);
 		// Trace reflectionRay
 		CRTColor reflectionColor = intersectScene(reflectionRay);
@@ -235,8 +216,8 @@ CRTColor CRTRenderer::shadeRefractive(const CRTRay& ray,
 	} else {
 		// Construct reflectionRay
 		CRTRay reflectionRay(bestIntersectionPoint.p + normal * REFLECTION_BIAS,
-			ray.direction - 2.0f * ray.direction.dot(normal) * normal, 
-			ray.pathDepth + 1, 
+			ray.direction - 2.0f * ray.direction.dot(normal) * normal,
+			ray.pathDepth + 1,
 			RayType::reflective);
 		// Trace reflectionRay and return
 		return intersectScene(reflectionRay);
@@ -286,7 +267,7 @@ CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
 		CRTVector normLightDir = lightDir.normalize();
 		// Calculate the Cosine Law:
 		float cosLaw = normLightDir.dot(shadeNormal);
-		if (cosLaw < -EPSILON) { continue; }
+		if (lessThan(cosLaw, 0.0f)) { continue; }
 		// Compute sphere area
 		float sa = 4.0f * (float)M_PI * sr * sr;
 		// Create shadowRay
@@ -294,49 +275,15 @@ CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
 			normLightDir, MAX_DEPTH, RayType::shadow);
 		// Trace shadowRay to check for triangle intersection
 		if (hasShadow) {
-			bool isNotVisible = hasIntersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects(), sr);
-			finalColor += isNotVisible ? CRTColor{material.albedo / 2.0f * cosLaw} :
+			CRTColor dummy{};
+			bool isNotVisible = intersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects(), sr, dummy);
+			finalColor += isNotVisible ? CRTColor{ 0.0f } :
 				CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
 		} else {
 			finalColor += CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
 		}
 	}
 	return finalColor;
-}
-
-bool CRTRenderer::hasIntersectRayWithObjectsInScene(const CRTRay& ray,
-	const std::vector<CRTMesh>& geometryObjects,
-	const float thresholdPminusLight) const {
-
-	const size_t len = geometryObjects.size();
-	for (size_t i = 0; i < len; i++) {
-		if (geometryObjects[i].getMaterial().type == CRTMaterial::refractive) {
-			continue;
-		}
-		const CRTAABB& aabbBox = geometryObjects[i].getBox();
-		if (aabbBox.isValid()) {
-			const retIntersectionBox& data = aabbBox.intersect(ray, thresholdPminusLight);
-			if (data.isValid) {
-				// Do the intersection with the object
-				//bestTBox = data.t;
-			} else {
-				// Skip the intersection with the object
-				continue;
-			}
-		}
-		const std::vector<CRTTriangle>& triangles = geometryObjects[i].getTriangles();
-		const size_t lenTri = triangles.size();
-		for (size_t j = 0; j < lenTri; j++) {
-			const CRTTriangle::retDataFromTriangleIntersect& intersectData =
-				triangles[j].intersect(ray, thresholdPminusLight);
-			//	If P is on the left of the 3 edges and t > 0, we have an intersection
-			if (intersectData.isValid) {
-				return true;
-			}
-		}
-
-	}
-	return false;
 }
 
 void CRTRenderer::loadCRTScene(const std::string& sceneFilename) {

@@ -2,6 +2,7 @@
 #define CRTRGBCOLOR_H
 
 #include "CRTVector.h"
+#include "constants.h"
 
 const int maxRGBColorComponent = 255;
 struct CRTRGBColor {
@@ -23,9 +24,9 @@ struct CRTRGBColor {
 
 	CRTRGBColor toRGB32(const CRTVector& rhs) {
 		CRTRGBColor ret;
-		ret.r = (rhs.x > 1.0f || equals(rhs.x, 1.0f)) ? maxRGBColorComponent : (unsigned char)(rhs.x * 256.0f);
-		ret.g = (rhs.y > 1.0f || equals(rhs.y, 1.0f)) ? maxRGBColorComponent : (unsigned char)(rhs.y * 256.0f);
-		ret.b = (rhs.z > 1.0f || equals(rhs.z, 1.0f)) ? maxRGBColorComponent : (unsigned char)(rhs.z * 256.0f);
+		ret.r = greaterEqThan(rhs.x, 1.0f) ? maxRGBColorComponent : (unsigned char)(rhs.x * 256.0f);
+		ret.g = greaterEqThan(rhs.y, 1.0f) ? maxRGBColorComponent : (unsigned char)(rhs.y * 256.0f);
+		ret.b = greaterEqThan(rhs.z, 1.0f) ? maxRGBColorComponent : (unsigned char)(rhs.z * 256.0f);
 		return ret;
 	}
 };

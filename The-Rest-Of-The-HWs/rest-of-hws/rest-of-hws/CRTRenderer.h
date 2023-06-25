@@ -6,7 +6,7 @@
 #include <execution>
 
 #include "CRTRay.h"
-#include "CRTAABB.h"
+#include "CRTBox.h"
 #include "CRTMesh.h"
 #include "CRTColor.h"
 #include "CRTImage.h"
@@ -36,17 +36,11 @@ public:
 private:
 
 	float currentIOR = 1.0f;
-	CRTIntersectionData intersectRayWithAnObject(const CRTRay& ray,
-		const size_t idxGeometryObject,
-		const CRTMesh& geometryObject,
-		float& bestT) const;
 
-	CRTColor intersectRayWithObjectsInScene(const CRTRay& ray,
-		const std::vector<CRTMesh>& geometryObjects) const;
-
-	bool hasIntersectRayWithObjectsInScene(const CRTRay& ray,
+	bool intersectRayWithObjectsInScene(const CRTRay& ray,
 		const std::vector<CRTMesh>& geometryObjects,
-		const float thresholdPminusLight) const;
+		const float& bestTDefault,
+		CRTColor& col) const;
 
 	CRTColor shadeRefractive(const CRTRay& ray,
 		const CRTIntersectionData& bestIntersectionPoint) const;

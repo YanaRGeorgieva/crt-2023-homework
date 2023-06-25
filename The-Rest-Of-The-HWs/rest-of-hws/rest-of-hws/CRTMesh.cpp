@@ -40,7 +40,7 @@ const CRTMaterial& CRTMesh::getMaterial() const {
 	return material;
 }
 
-const CRTAABB& CRTMesh::getBox() const {
+const CRTBox& CRTMesh::getBox() const {
 	return box;
 }
 
@@ -54,4 +54,30 @@ void CRTMesh::calculateAABB() {
 		// Expand box with vertex
 		box.expand(vertex);
 	}
+}
+
+CRTIntersectionData CRTMesh::intersect(const CRTRay& ray,
+	const size_t idxGeometryObject,
+	float& bestT,
+	const bool isShadowRay) const {
+	CRTIntersectionData intersectionPointInfo{};
+	intersectionPointInfo.isValid = false;
+
+	const size_t len = triangles.size();
+	for (size_t i = 0; i < len; i++) {
+		const CRTTriangle& tri = triangles[i];
+		const CRTTriangle::retDataFromTriangleIntersect& intersectData = tri.intersect(ray, bestT);
+		//	If P is on the left of the 3 edges and t > 0, we have an intersection
+		if (intersectData.isValid) {
+			if (isShadowRay) {
+				// One intersection suffices
+				intersectionPointInfo.isValid = true;
+				return intersectionPointInfo;
+			}
+			// Get closest p (with least length)
+			bestT = intersectData.t;
+			intersectionPointInfo.set(idxGeometryObject, i, tri, intersectData, this->material, vertexNormals, faces);
+		}
+	}
+	return intersectionPointInfo;
 }

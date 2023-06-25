@@ -21,7 +21,7 @@ struct CRTIntersectionData {
 		const size_t& idxTriangleI,
 		const CRTTriangle& triangle,
 		const CRTTriangle::retDataFromTriangleIntersect intersectData,
-		const CRTMesh& geometryObject,
+		const CRTMaterial& geometryObjectMaterial,
 		const std::vector<CRTVector>& vertexNormals,
 		const std::vector<size_t>& faces
 	) {
@@ -36,7 +36,7 @@ struct CRTIntersectionData {
 				vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
 				vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
 		barycentricCoordinates = intersectData.barycentricCoordinates;
-		material = geometryObject.getMaterial();
+		material = geometryObjectMaterial;
 		isValid = true;
 	}
 };

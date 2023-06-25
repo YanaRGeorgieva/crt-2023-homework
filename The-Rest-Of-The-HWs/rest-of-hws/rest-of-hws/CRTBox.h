@@ -1,5 +1,5 @@
-#ifndef CRTAABB_H
-#define CRTAABB_H
+#ifndef CRTBOX_H
+#define CRTBOX_H
 
 #include <vector>
 
@@ -8,15 +8,15 @@
 #include "CRTTriangle.h"
 
 struct retIntersectionBox {
-	bool isValid;
-	float t;
-	CRTVector p;
+	bool isValid = false;
+	float t = 0.0f;
+	CRTVector p = zeroVector;
 };
 
-class CRTAABB {
+class CRTBox {
 public:
-	CRTAABB(const CRTVector& boxMin = CRTVector(maxFloat),
-		const CRTVector& boxMax = CRTVector(minFloat)) :
+	CRTBox(const CRTVector& boxMin = CRTVector(MAX_FLOAT),
+		const CRTVector& boxMax = CRTVector(MIN_FLOAT)) :
 		boxMin(boxMin), boxMax(boxMax) {}
 
 	bool isValid() const;
@@ -26,4 +26,4 @@ private:
 	CRTVector boxMin, boxMax;
 };
 
-#endif // !CRTAABB_H
+#endif // !CRTBOX_H

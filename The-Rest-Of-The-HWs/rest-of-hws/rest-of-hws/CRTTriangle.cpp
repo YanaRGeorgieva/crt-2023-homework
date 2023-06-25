@@ -36,28 +36,28 @@ CRTTriangle::retDataFromTriangleIntersect CRTTriangle::intersect(const CRTRay& r
 	const CRTVector p = ray.origin + t * ray.direction;
 
 	// For shading t > 0
-	if (!(t >= -EPSILON) || thresholdT + EPSILON < t) {
+	if (!greaterEqThan(t, 0.0f) || lessThan(thresholdT, t)) {
 		return worstResult;
 	}
 
 	// Check if P is on the left of E0 : dot(N, cross(E0, V0P)) > 0
 	const CRTVector v0p = p - v0;
 	const float dotTriNormalWithe0xv0p = faceNormal.dot(e0.cross(v0p));
-	if (!(dotTriNormalWithe0xv0p >= -EPSILON)) {
+	if (!greaterEqThan(dotTriNormalWithe0xv0p, 0.0f)) {
 		return worstResult;
 	}
 
 	// Check if P is on the left of E1 : dot(N, cross(E1, V1P)) > 0
 	const CRTVector v1p = p - v1;
 	const float dotTriNormalWithe1xv1p = faceNormal.dot(e1.cross(v1p));
-	if (!(dotTriNormalWithe1xv1p >= -EPSILON)) {
+	if (!greaterEqThan(dotTriNormalWithe1xv1p, 0.0f)) {
 		return worstResult;
 	}
 
 	// Check if P is on the left of E2 : dot(N, cross(E2, V2P)) > 0
 	const CRTVector v2p = p - v2;
 	const float dotTriNormalWithe2xv2p = faceNormal.dot(e2.cross(v2p));
-	if (!(dotTriNormalWithe2xv2p >= -EPSILON)) {
+	if (!greaterEqThan(dotTriNormalWithe2xv2p, 0.0f)) {
 		return worstResult;
 	}
 
