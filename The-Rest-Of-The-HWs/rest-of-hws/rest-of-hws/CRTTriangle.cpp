@@ -18,7 +18,7 @@ float CRTTriangle::getArea() const {
 	return e0.cross(e1).length() / 2.0f;
 }
 
-CRTTriangle::retDataFromTriangleIntersect CRTTriangle::intersect(const CRTRay& ray, const float thresholdT, const bool backface) const {
+CRTTriangle::retDataFromTriangleIntersect CRTTriangle::intersect(const CRTRay& ray, const float thresholdT) const {
 	retDataFromTriangleIntersect worstResult{};
 	worstResult.isValid = false;
 
@@ -70,4 +70,12 @@ CRTTriangle::retDataFromTriangleIntersect CRTTriangle::intersect(const CRTRay& r
 	CRTVector barycentricCoordinates(u, v, w);
 
 	return retDataFromTriangleIntersect{ p, barycentricCoordinates, t, true };
+}
+
+const CRTUintVector& CRTTriangle::getVerticesFacesIndices() const {
+	return verticesFacesIndices;
+}
+
+const CRTVector& CRTTriangle::getCentroid() const {
+	return centroid;
 }

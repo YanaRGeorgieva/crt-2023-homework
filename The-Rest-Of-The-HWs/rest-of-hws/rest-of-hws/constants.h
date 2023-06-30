@@ -11,6 +11,9 @@ const float REFRACTION_BIAS = 1e-3f;
 const int MAX_DEPTH = 7;
 
 const int MAX_TRIANGLES_PER_LEAF = 10;
+const int MAX_TREE_DEPTH = 64;
+
+const int AXIS_COUNT = 3;
 
 const float EPSILON = 1e-5f;
 
@@ -41,4 +44,16 @@ inline bool greaterThan(const float a, const float b, const float tolerance = EP
 inline bool greaterEqThan(const float a, const float b, const float tolerance = EPSILON) {
 	return a > b - tolerance || equals(a, b);
 }
+
+struct CRTUintVector {
+	size_t x, y, z;
+
+	size_t& operator [](const int idx) {
+		return (&x)[idx % AXIS_COUNT];
+	}
+
+	const size_t& operator [](const int idx) const {
+		return (&x)[idx % AXIS_COUNT];
+	}
+};
 #endif // !UTILS_H

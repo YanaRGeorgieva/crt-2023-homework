@@ -17,21 +17,21 @@ void CRTParser::loadJsonDocument(const std::string& filename) {
 }
 
 void CRTParser::loadVector(const rapidjson::Value::ConstArray& arr, CRTVector& vec) const {
-	assert(arr.Size() == 3);
+	assert(arr.Size() == AXIS_COUNT);
 	vec = CRTVector{ static_cast<float>(arr[0].GetDouble()),
 		static_cast<float>(arr[1].GetDouble()),
 		static_cast<float>(arr[2].GetDouble()) };
 }
 
 CRTVector CRTParser::loadVector(const rapidjson::Value::ConstArray& arr) const {
-	assert(arr.Size() == 3);
+	assert(arr.Size() == AXIS_COUNT);
 	return CRTVector{ static_cast<float>(arr[0].GetDouble()),
 		static_cast<float>(arr[1].GetDouble()),
 		static_cast<float>(arr[2].GetDouble()) };
 }
 
 void CRTParser::loadMatrix(const rapidjson::Value::ConstArray& arr, CRTMatrix& mat) const {
-	assert(arr.Size() == 9);
+	assert(arr.Size() == AXIS_COUNT * AXIS_COUNT);
 	mat = CRTMatrix{
 				CRTVector{static_cast<float>(arr[0].GetDouble()),
 			static_cast<float>(arr[1].GetDouble()),
@@ -46,7 +46,7 @@ void CRTParser::loadMatrix(const rapidjson::Value::ConstArray& arr, CRTMatrix& m
 }
 
 CRTMatrix CRTParser::loadMatrix(const rapidjson::Value::ConstArray& arr) const {
-	assert(arr.Size() == 9);
+	assert(arr.Size() == AXIS_COUNT * AXIS_COUNT);
 	return CRTMatrix{
 				CRTVector{static_cast<float>(arr[0].GetDouble()),
 			static_cast<float>(arr[1].GetDouble()),
@@ -62,10 +62,10 @@ CRTMatrix CRTParser::loadMatrix(const rapidjson::Value::ConstArray& arr) const {
 
 std::vector<CRTVector> CRTParser::loadArrayOfVectors(const rapidjson::Value::ConstArray& arr) const {
 	const rapidjson::SizeType len = arr.Size();
-	assert(len % 3 == 0);
+	assert(len % AXIS_COUNT == 0);
 	std::vector<CRTVector> vertices;
-	vertices.reserve(len / 3);
-	for (rapidjson::SizeType i = 0; i < len; i += 3) {
+	vertices.reserve(len / AXIS_COUNT);
+	for (rapidjson::SizeType i = 0; i < len; i += AXIS_COUNT) {
 		vertices.emplace_back(CRTVector{ static_cast<float>(arr[i].GetDouble()),
 						static_cast<float>(arr[i + 1].GetDouble()),
 						static_cast<float>(arr[i + 2].GetDouble()) }
@@ -76,7 +76,7 @@ std::vector<CRTVector> CRTParser::loadArrayOfVectors(const rapidjson::Value::Con
 
 std::vector<size_t> CRTParser::loadArrayOfUInts(const rapidjson::Value::ConstArray& arr) const {
 	const rapidjson::SizeType len = arr.Size();
-	assert(len % 3 == 0);
+	assert(len % AXIS_COUNT == 0);
 	std::vector<size_t> faces;
 	faces.reserve(len);
 	for (rapidjson::SizeType i = 0; i < len; i++) {
@@ -138,8 +138,8 @@ std::vector<CRTMesh> CRTParser::loadObjects() const {
 			assert(!materialIndexVal.IsNull() && materialIndexVal.IsUint());
 
 			geometryObjects.emplace_back(
-				loadArrayOfVectors(verticesVal.GetArray()), 
-				loadArrayOfUInts(trianglesVal.GetArray()), 
+				loadArrayOfVectors(verticesVal.GetArray()),
+				loadArrayOfUInts(trianglesVal.GetArray()),
 				materialIndexVal.GetUint());
 		}
 	}
@@ -161,7 +161,7 @@ std::vector<CRTLight> CRTParser::loadLights() const {
 			assert(!lightIntensityVal.IsNull() && lightIntensityVal.IsUint());
 
 			lights.emplace_back(
-				loadVector(lightPositionVal.GetArray()), 
+				loadVector(lightPositionVal.GetArray()),
 				static_cast<float>(lightIntensityVal.GetDouble()));
 		}
 	}
@@ -197,9 +197,9 @@ std::vector<CRTMaterial> CRTParser::loadMaterials() const {
 			assert(!materialIsSmoothShaded.IsNull() && materialIsSmoothShaded.IsBool());
 
 			materials.emplace_back(
-				materialAlbedoVal ? loadVector(materialAlbedoVal->GetArray()) : CRTVector(1.0f), 
-				materialTypeVal.GetString(), 
-				materialIsSmoothShaded.GetBool(), 
+				materialAlbedoVal ? loadVector(materialAlbedoVal->GetArray()) : CRTVector(1.0f),
+				materialTypeVal.GetString(),
+				materialIsSmoothShaded.GetBool(),
 				materialIorVal ? static_cast<float>(materialIorVal->GetDouble()) : 0.0f);
 		}
 	}

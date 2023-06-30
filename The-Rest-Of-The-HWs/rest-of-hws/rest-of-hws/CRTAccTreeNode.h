@@ -9,19 +9,28 @@
 #include "CRTIntersectionData.h"
 
 /// Node for the acceleration tree structure,
-/// holding a box for the sub space thr node represents and indices for the children sub spaces represented by nodes
+/// holding a box for the sub space the node represents and indices for the children sub spaces represented by nodes
 struct CRTAccTreeNode {
-	CRTAccTreeNode(const CRTBox& aabb, const int parentIdx, const int leftNodeidx, const int rightNodeIdx, const std::vector<CRTTriangle>& traingles);
+	CRTAccTreeNode() : aabb() {
+		triangles.clear();
+		parent = -1;
+		children[0] = -1;
+		children[1] = -1;
+	};
 
-	/// Intersect the ray with the triangles in the box, meaningful only for nodes, the others do not trore triangles
-	void intersect(
-		const CRTRay& ray,
-		const float maxT,
-		const std::vector<CRTMaterial>& materials,
-		float& t,
-		float& minT,
-		CRTIntersectionData& data
-	) const;
+	///// Intersect the ray with the triangles in the box, meaningful only for nodes, the others do not have triangles
+	//void intersect(
+	//	const CRTRay& ray,
+	//	const float maxT,
+	//	const std::vector<CRTMaterial>& materials,
+	//	float& t,
+	//	float& minT,
+	//	CRTIntersectionData& data
+	//) const;
+
+	bool isLeaf() const {
+		return children[0] == -1 && children[1] == -1;
+	}
 
 	std::vector<CRTTriangle> triangles; ///< In case of a leaf node a list with the traingles for intersection in the box for the node, empty otherwise
 	CRTBox aabb; ///< Axis aligned box for the sub space this node represents

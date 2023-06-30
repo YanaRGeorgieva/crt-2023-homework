@@ -28,6 +28,6 @@ void CRTScene::parseSceneFile(const std::string& sceneFileName) {
 	geometryObjects = parser.loadObjects();
 	for (auto& object : geometryObjects) {
 		object.generateGeometry();
-		object.setMaterial(materials);
+		object.setMaterial(materials[object.getMaterialIdx()]);
 	}
 }

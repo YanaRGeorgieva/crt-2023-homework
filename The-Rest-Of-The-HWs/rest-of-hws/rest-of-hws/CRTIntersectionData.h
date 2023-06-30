@@ -8,7 +8,7 @@
 
 struct CRTIntersectionData {
 	size_t idxGeometry; ///< Closest object to the ray origin
-	size_t idxTriangle; ///< Closest tringle of the closest object to the ray origin
+	long long idxTriangle; ///< Closest tringle of the closest object to the ray origin
 	CRTVector p; ///< The hit point in 3D world space
 	float t; ///< Distance from ray origin to the closest triangle of the closest object to the ray origin
 	CRTVector triangleFace; ///< Closest tringle normal vector
@@ -18,7 +18,7 @@ struct CRTIntersectionData {
 	bool isValid; ///< If the structure instance is valid
 
 	void set(const size_t& idxGeometryObject,
-		const size_t& idxTriangleI,
+		const long long& idxTriangleI,
 		const CRTTriangle& triangle,
 		const CRTTriangle::retDataFromTriangleIntersect intersectData,
 		const CRTMaterial& geometryObjectMaterial,
@@ -30,11 +30,11 @@ struct CRTIntersectionData {
 		p = intersectData.p;
 		t = intersectData.t;
 		triangleFace = triangle.getFaceNormal();
-		const size_t idx = idxTriangleI * 3;
+		const CRTUintVector& facesIndices = triangle.getVerticesFacesIndices();
 		interpolatedVerticesNormal =
-			(vertexNormals[faces[idx + 1]] * intersectData.barycentricCoordinates.x +
-				vertexNormals[faces[idx + 2]] * intersectData.barycentricCoordinates.y +
-				vertexNormals[faces[idx]] * intersectData.barycentricCoordinates.z).normalize();
+			(vertexNormals[facesIndices.y] * intersectData.barycentricCoordinates.x +
+				vertexNormals[facesIndices.z] * intersectData.barycentricCoordinates.y +
+				vertexNormals[facesIndices.x] * intersectData.barycentricCoordinates.z).normalize();
 		barycentricCoordinates = intersectData.barycentricCoordinates;
 		material = geometryObjectMaterial;
 		isValid = true;

@@ -7,7 +7,7 @@ bool CRTBox::isValid() const {
 }
 
 void CRTBox::expand(const CRTVector& vertex) {
-	for (int axis = 0; axis < 3; axis++) {
+	for (int axis = 0; axis < AXIS_COUNT; axis++) {
 		boxMin[axis] = std::fminf(boxMin[axis], vertex[axis]);
 		boxMax[axis] = std::fmaxf(boxMax[axis], vertex[axis]);
 	}
@@ -19,7 +19,7 @@ retIntersectionBox CRTBox::intersect(const CRTRay& ray, const float& thresholdT)
 
 	const CRTVector invDirection = CRTVector(1.0f / ray.direction.x, 1.0f / ray.direction.y, 1.0f / ray.direction.z);
 
-	for (int axis = 0; axis < 3; axis++) {
+	for (int axis = 0; axis < AXIS_COUNT; axis++) {
 		// Check for intersection on axis side
 		float tMinX = (boxMin[axis] - ray.origin[axis]) * invDirection[axis];
 		if (greaterThan(tMinX, 0.0f) && lessThan(tMinX, thresholdT)) {

@@ -11,14 +11,13 @@
 
 class CRTTriangle {
 public:
-	static const int numberOFVertices = 3;
-
-	CRTTriangle(const CRTVector& x, const CRTVector& y, const CRTVector& z) :v0(x), v1(y), v2(z) {
+	CRTTriangle(const CRTVector& x, const CRTVector& y, const CRTVector& z, const CRTUintVector& facesIndices) :v0(x), v1(y), v2(z), verticesFacesIndices(facesIndices) {
 		// Generate triangles normal vectors : normalize(cross(E0, E1)) - precomputed 
 		computeFaceNormal();
 		e0 = v1 - v0;
 		e1 = v2 - v1;
 		e2 = v0 - v2;
+		centroid = (v0 + v1 + v2) / 3.0f;
 	}
 
 	const CRTVector& operator [](const int idx) const {
@@ -29,6 +28,10 @@ public:
 
 	float getArea() const;
 
+	const CRTUintVector& getVerticesFacesIndices() const;
+
+	const CRTVector& getCentroid() const;
+
 	struct retDataFromTriangleIntersect {
 		CRTVector p;
 		CRTVector barycentricCoordinates;
@@ -36,11 +39,13 @@ public:
 		bool isValid;
 	};
 
-	retDataFromTriangleIntersect intersect(const CRTRay& ray, const float thresholdT = 1e30f, const bool backface = true) const;
+	retDataFromTriangleIntersect intersect(const CRTRay& ray, const float thresholdT = 1e30f) const;
 private:
 	void computeFaceNormal();
 
 	CRTVector v0, v1, v2;
+	CRTUintVector verticesFacesIndices;
+	CRTVector centroid;
 	CRTVector faceNormal;
 	CRTVector e0, e1, e2;
 };

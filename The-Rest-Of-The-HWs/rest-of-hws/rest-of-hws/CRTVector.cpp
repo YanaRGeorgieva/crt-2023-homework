@@ -69,6 +69,10 @@ CRTVector CRTVector::operator/ (const int scalar) const {
 	return CRTVector{ x / (float)scalar, y / (float)scalar, z / (float)scalar };
 }
 
+CRTVector CRTVector::operator/ (const float scalar) const {
+	return CRTVector{ x / scalar, y / scalar, z / scalar };
+}
+
 CRTVector operator* (const int scalar, const CRTVector& rhs) {
 	return CRTVector{ rhs.x * (float)scalar, rhs.y * (float)scalar, rhs.z * (float)scalar };
 }

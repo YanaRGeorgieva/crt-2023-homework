@@ -2,12 +2,15 @@
 #define CRTMESH_H
 
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 #include "CRTBox.h"
 #include "constants.h"
 #include "CRTVector.h"
 #include "CRTMaterial.h"
 #include "CRTTriangle.h"
+#include "CRTAccTreeNode.h"
 #include "CRTIntersectionData.h"
 
 class CRTMesh {
@@ -26,13 +29,15 @@ public:
 	const std::vector<CRTVector>& getVertexNormals() const;
 	const std::vector<CRTTriangle>& getTriangles() const;
 	const CRTMaterial& getMaterial() const;
+	const size_t& getMaterialIdx() const;
 	const CRTBox& getBox() const;
-	void setMaterial(const std::vector<CRTMaterial>& materials);
+	void setMaterial(const CRTMaterial& material);
+	CRTIntersectionData intersect(const CRTRay& ray, const size_t idxGeometryObject, float& bestT) const;
+	CRTIntersectionData intersectBVH(const CRTRay& ray, const size_t idxGeometryObject, float& bestT) const;
+	CRTIntersectionData BVHTreeIntersect(const CRTRay& ray, const size_t idxGeometryObject, const float& bestT, const CRTAccTreeNode& node) const;
 	void calculateAABB();
-	CRTIntersectionData intersect(const CRTRay& ray,
-		const size_t idxGeometryObject,
-		float& bestT,
-		const bool isShadowRay = false) const;
+	void constructBVHTree();
+	void constructBVHTreeRecursively(int nodeIdx = 0, int depth = 0);
 
 private:
 	std::vector<CRTVector> vertices;
@@ -45,6 +50,7 @@ private:
 	CRTMaterial material;
 
 	CRTBox box;
+	std::vector<CRTAccTreeNode> bvhTree;
 };
 
 #endif // !CRTMESH_H

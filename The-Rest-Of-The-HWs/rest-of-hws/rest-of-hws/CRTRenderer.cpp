@@ -1,5 +1,10 @@
 #include "CRTRenderer.h"
 
+void CRTRenderer::loadCRTScene(const std::string& sceneFilename) {
+	scene->parseSceneFile(sceneFilename);
+	currentIOR = 1.0f;
+}
+
 CRTColor CRTRenderer::intersectScene(const CRTRay& ray) const {
 	CRTColor resultColor{};
 	intersectRayWithObjectsInScene(ray, scene->getGeometryObjects(), MAX_FLOAT, resultColor);
@@ -51,7 +56,7 @@ CRTImage CRTRenderer::render() const {
 	//	}
 
 
-		// At each pixel :
+	// At each pixel :
 	for (size_t i = 0; i < length; i++) {
 		const CRTImage& subImage = subImages[i];
 		const size_t& height = subImage.getImageHeight();
@@ -66,7 +71,6 @@ CRTImage CRTRenderer::render() const {
 		}
 	}
 
-	//CRTImage image(imageWidth, imageHeight);
 	//processSubimage(image);
 	return image;
 }
@@ -82,9 +86,6 @@ void CRTRenderer::processSubimage(CRTImage& subImage) const {
 			// Generate camera ray R : 3rd Lecture taking into account the camera position
 			const size_t rIdx = top + rowIdx;
 			const size_t cIdx = left + colIdx;
-			if (cIdx == 1146 && rIdx == 726) {
-				int b = 0;
-			}
 			CRTRay cameraRay = scene->getCamera().generateCameraRay(rIdx, cIdx);
 			subImage.setPixel(rowIdx, colIdx, intersectScene(cameraRay));
 		}
@@ -101,22 +102,10 @@ bool CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 	bestIntersectionPointInfo.isValid = false;
 
 	float bestT{ bestTDefault };
-	//float bestTBox{ maxFloat };
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
-		const CRTBox& aabbBox = geometryObjects[i].getBox();
-		if (aabbBox.isValid()) {
-			const retIntersectionBox& data = aabbBox.intersect(ray, bestT);
-			if (data.isValid) {
-				// Do the intersection with the object
-				//bestTBox = data.t;
-			} else {
-				// Skip the intersection with the object
-				continue;
-			}
-		}
-		intersectionPoint = geometryObjects[i].intersect(ray, i, bestT);
+		intersectionPoint = geometryObjects[i].intersectBVH(ray, i, bestT);
 		if (intersectionPoint.isValid) {
 			if (ray.type == RayType::shadow) {
 				return true;
@@ -286,7 +275,3 @@ CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
 	return finalColor;
 }
 
-void CRTRenderer::loadCRTScene(const std::string& sceneFilename) {
-	scene->parseSceneFile(sceneFilename);
-	currentIOR = 1.0f;
-}
