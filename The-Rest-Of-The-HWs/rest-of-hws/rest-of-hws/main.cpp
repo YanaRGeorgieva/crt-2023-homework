@@ -34,7 +34,7 @@ int main() {
 		} else if (fovy == 60 && !fovCycle) {
 			fovCycle = true;
 			fovy--;
-		} else if (fovy < 60 && fovCycle) {
+		} else if (fovy > 0 && fovy < 60 && fovCycle) {
 			fovy--;
 		} else if (fovy == 0 && fovCycle) {
 			fovy++;
