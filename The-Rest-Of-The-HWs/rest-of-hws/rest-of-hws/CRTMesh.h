@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <iterator>
 
 #include "CRTBox.h"
 #include "constants.h"
@@ -32,12 +31,13 @@ public:
 	const size_t& getMaterialIdx() const;
 	const CRTBox& getBox() const;
 	void setMaterial(const CRTMaterial& material);
+
 	CRTIntersectionData intersect(const CRTRay& ray, const size_t idxGeometryObject, float& bestT) const;
-	CRTIntersectionData intersectBVH(const CRTRay& ray, const size_t idxGeometryObject, float& bestT) const;
-	CRTIntersectionData BVHTreeIntersect(const CRTRay& ray, const size_t idxGeometryObject, const float& bestT, const CRTAccTreeNode& node) const;
 	void calculateAABB();
 	void constructBVHTree();
 	void constructBVHTreeRecursively(int nodeIdx = 0, int depth = 0);
+	CRTIntersectionData intersectBVHTree(const CRTRay& ray, const size_t idxGeometryObject, float& bestT) const;
+	CRTIntersectionData intersectBVHTreeRecursively(const CRTRay& ray, const size_t idxGeometryObject, const float& bestT, const CRTAccTreeNode& node) const;
 
 private:
 	std::vector<CRTVector> vertices;

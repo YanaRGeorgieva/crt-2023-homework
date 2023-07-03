@@ -33,6 +33,8 @@ public:
 	void loadCRTScene(const std::string& sceneFilename);
 	//bool exportCRTScene(const std::string& sceneFilename) const;
 
+	CRTCamera& getCamera();
+
 private:
 
 	float currentIOR = 1.0f;
@@ -52,8 +54,7 @@ private:
 		const CRTIntersectionData& bestIntersectionPoint) const;
 
 	CRTColor shadeDiffuse(const CRTRay& ray,
-		const CRTIntersectionData& bestIntersectionPoint,
-		const bool hasShadow = true) const;
+		const CRTIntersectionData& bestIntersectionPoint) const;
 
 	CRTColor shade(const CRTRay& ray,
 		const CRTIntersectionData& bestIntersectionPoint) const;

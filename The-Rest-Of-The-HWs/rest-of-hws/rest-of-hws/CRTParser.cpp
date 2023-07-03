@@ -179,14 +179,14 @@ std::vector<CRTMaterial> CRTParser::loadMaterials() const {
 			const rapidjson::Value& materialTypeVal = arr[i][crtSceneMaterialType];
 			assert(!materialTypeVal.IsNull() && materialTypeVal.IsString());
 
-			const rapidjson::Value* materialAlbedoVal = NULL;
+			const rapidjson::Value* materialAlbedoVal = nullptr;
 			const rapidjson::Value::ConstMemberIterator materialAlbedoItr = arr[i].FindMember(crtSceneMaterialAlbedo);
 			if (materialAlbedoItr != arr[i].MemberEnd()) {
 				materialAlbedoVal = &arr[i][crtSceneMaterialAlbedo];
 				assert(!materialAlbedoVal->IsNull() && materialAlbedoVal->IsArray());
 			}
 
-			const rapidjson::Value* materialIorVal = NULL;
+			const rapidjson::Value* materialIorVal = nullptr;
 			const rapidjson::Value::ConstMemberIterator materialIorItr = arr[i].FindMember(crtSceneMaterialIor);
 			if (materialIorItr != arr[i].MemberEnd()) {
 				materialIorVal = &arr[i][crtSceneMaterialIor];

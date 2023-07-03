@@ -82,21 +82,21 @@ CRTMatrix operator *(const double& x, const CRTMatrix& m) {
 }
 
 CRTMatrix makeRotationCRTMatrixX(const float xangle) {
-	const float xrot = xangle * ((float)M_PI / 180.0f);
+	const float xrot = deg2rad(xangle);
 	const float s = sin(xrot);
 	const float c = cos(xrot);
 	return CRTMatrix(CRTVector(1.0f, 0.0f, 0.0f), CRTVector(0.0f, c, s), CRTVector(0.0f, -s, c));
 }
 
 CRTMatrix makeRotationCRTMatrixY(const float yangle) {
-	const float yrot = yangle * ((float)M_PI / 180.0f);
+	const float yrot = deg2rad(yangle);
 	const float s = sin(yrot);
 	const float c = cos(yrot);
 	return CRTMatrix(CRTVector(c, 0.0f, -s), CRTVector(0.0f, 1.0f, 0.0f), CRTVector(s, 0.0f, c));
 }
 
 CRTMatrix makeRotationCRTMatrixZ(const float zangle) {
-	const float zrot = zangle * ((float)M_PI / 180.0f);
+	const float zrot = deg2rad(zangle);
 	const float s = sin(zrot);
 	const float c = cos(zrot);
 	return CRTMatrix(CRTVector(c, s, 0.0f), CRTVector(-s, c, 0.0f), CRTVector(0.0f, 0.0f, 1.0f));

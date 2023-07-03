@@ -1,7 +1,6 @@
 #ifndef INTERSECTIONDATA_H
 #define INTERSECTIONDATA_H
 
-#include "CRTMesh.h"
 #include "CRTColor.h"
 #include "CRTMaterial.h"
 #include "CRTTriangle.h"

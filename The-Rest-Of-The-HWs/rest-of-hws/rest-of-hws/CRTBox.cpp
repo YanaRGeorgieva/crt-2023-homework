@@ -34,7 +34,7 @@ retIntersectionBox CRTBox::intersect(const CRTRay& ray, const float& thresholdT)
 		}
 
 		float tMaxX = (boxMax[axis] - ray.origin[axis]) * invDirection[axis];
-		if (greaterThan(tMaxX, 0.0f) && lessThan(tMaxX, thresholdT)) {
+		if (greaterThan(tMaxX, 0.0f) && lessThan(tMaxX, thresholdT, 1e-3f)) {
 			CRTVector pMaxX = ray.origin + tMaxX * ray.direction;
 			if (greaterEqThan(pMaxX[axis + 1], boxMin[axis + 1]) && lessEqThan(pMaxX[axis + 1], boxMax[axis + 1]) &&
 				greaterEqThan(pMaxX[axis + 2], boxMin[axis + 2]) && lessEqThan(pMaxX[axis + 2], boxMax[axis + 2])) {

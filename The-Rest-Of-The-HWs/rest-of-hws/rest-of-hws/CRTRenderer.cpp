@@ -1,5 +1,9 @@
 #include "CRTRenderer.h"
 
+CRTCamera& CRTRenderer::getCamera() {
+	return scene->getCamera();
+}
+
 void CRTRenderer::loadCRTScene(const std::string& sceneFilename) {
 	scene->parseSceneFile(sceneFilename);
 	currentIOR = 1.0f;
@@ -50,11 +54,6 @@ CRTImage CRTRenderer::render() const {
 	);
 
 	const int length = numVertical * numHorizontal;
-	//#pragma omp parallel for
-	//	for (int i = 0; i < length; i++) {
-	//		processSubimage(subImages[i]);
-	//	}
-
 
 	// At each pixel :
 	for (size_t i = 0; i < length; i++) {
@@ -71,7 +70,6 @@ CRTImage CRTRenderer::render() const {
 		}
 	}
 
-	//processSubimage(image);
 	return image;
 }
 
@@ -86,8 +84,12 @@ void CRTRenderer::processSubimage(CRTImage& subImage) const {
 			// Generate camera ray R : 3rd Lecture taking into account the camera position
 			const size_t rIdx = top + rowIdx;
 			const size_t cIdx = left + colIdx;
-			CRTRay cameraRay = scene->getCamera().generateCameraRay(rIdx, cIdx);
-			subImage.setPixel(rowIdx, colIdx, intersectScene(cameraRay));
+			CRTColor finalColor{};
+			for (int k = 0; k < MAX_SAMPLES; k++) {
+				CRTRay cameraRay = scene->getCamera().generateCameraRayRandom(rIdx, cIdx, k);
+				finalColor += intersectScene(cameraRay);
+			}
+			subImage.setPixel(rowIdx, colIdx, finalColor / MAX_SAMPLES);
 		}
 	}
 }
@@ -96,7 +98,6 @@ bool CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 	const std::vector<CRTMesh>& geometryObjects,
 	const float& bestTDefault,
 	CRTColor& col) const {
-
 	CRTIntersectionData intersectionPoint{};
 	CRTIntersectionData bestIntersectionPointInfo{};
 	bestIntersectionPointInfo.isValid = false;
@@ -105,7 +106,10 @@ bool CRTRenderer::intersectRayWithObjectsInScene(const CRTRay& ray,
 
 	const size_t len = geometryObjects.size();
 	for (size_t i = 0; i < len; i++) {
-		intersectionPoint = geometryObjects[i].intersectBVH(ray, i, bestT);
+		intersectionPoint = geometryObjects[i].intersectBVHTree(ray, i, bestT);
+		if (ray.type == RayType::shadow && geometryObjects[i].getMaterial().type == CRTMaterial::refractive) {
+			continue;
+		}
 		if (intersectionPoint.isValid) {
 			if (ray.type == RayType::shadow) {
 				return true;
@@ -232,8 +236,7 @@ CRTColor CRTRenderer::shadeReflective(const CRTRay& ray,
 }
 
 CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
-	const CRTIntersectionData& bestIntersectionPoint,
-	const bool hasShadow) const {
+	const CRTIntersectionData& bestIntersectionPoint) const {
 
 	const CRTMaterial& material = bestIntersectionPoint.material;
 
@@ -249,11 +252,11 @@ CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
 	// For all lights in the scene:
 	for (size_t i = 0; i < lightsCnt; i++) {
 		// Compute the direction from p to the light position:
-		CRTVector lightDir = lights[i].position - bestIntersectionPoint.p;
+		const CRTVector& lightDir = lights[i].position - bestIntersectionPoint.p;
 		// Compute sphere radius:
 		float sr = lightDir.length();
 		// Normalize lightDir
-		CRTVector normLightDir = lightDir.normalize();
+		const CRTVector& normLightDir = lightDir.normalize();
 		// Calculate the Cosine Law:
 		float cosLaw = normLightDir.dot(shadeNormal);
 		if (lessThan(cosLaw, 0.0f)) { continue; }
@@ -263,15 +266,48 @@ CRTColor CRTRenderer::shadeDiffuse(const CRTRay& ray,
 		CRTRay shadowRay(bestIntersectionPoint.p + shadeNormal * SHADOW_BIAS,
 			normLightDir, MAX_DEPTH, RayType::shadow);
 		// Trace shadowRay to check for triangle intersection
-		if (hasShadow) {
-			CRTColor dummy{};
-			bool isNotVisible = intersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects(), sr, dummy);
-			finalColor += isNotVisible ? CRTColor{ 0.0f } :
-				CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
-		} else {
-			finalColor += CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
+		CRTColor dummy{};
+		bool isNotVisible = intersectRayWithObjectsInScene(shadowRay, scene->getGeometryObjects(), sr, dummy);
+		finalColor += isNotVisible ? CRTColor{ 0.0f } :
+			CRTColor(lights[i].intensity / sa * material.albedo * cosLaw);
+	}
+
+	// GI algorithm
+	CRTColor diffuseReflectionsColor{};
+	if (ray.pathDepth < GI_MAX_DEPTH) {
+		const CRTVector& upAxis = shadeNormal;
+		const CRTVector& rightAxis = ray.direction.cross(upAxis).normalize();
+		const CRTVector& forwardAxis = rightAxis.cross(upAxis);
+		for (size_t i = 0; i < MAX_DIFFUSE_REFLECTION_RAY_COUNTS; i++) {
+			// Construct localHitMatrix
+			CRTMatrix localHitMatrix(rightAxis, upAxis, forwardAxis);
+			// Generate random angle [0, 180] degs in the XY plane
+			float randAngleInXY = (float)M_PI * getRandomFloatBetween0and1Inclusive();
+			// Construct random vector in XY plane:
+			float randAngleInXYRad = deg2rad(randAngleInXY);
+			CRTVector randVectorInXY(cos(randAngleInXYRad), sin(randAngleInXYRad), 0.0f);
+			// Generate random angle [0, 360] degs in the XZ plane
+			float randAngleInXZ = 2 * (float)M_PI * getRandomFloatBetween0and1Inclusive();
+			// Construct rotation matrix around Y
+			float randAngleInXZRad = deg2rad(randAngleInXZ);
+			CRTMatrix rotateAroundY(CRTVector(cos(randAngleInXZRad), 0.0f, -sin(randAngleInXZRad)),
+				CRTVector(0.0f, 1.0f, 0.0f),
+				CRTVector(sin(randAngleInXZRad), 0.0f, cos(randAngleInXZRad)));
+			// Rotate randVectorInXY
+			CRTVector randVectorInXYRotated = randVectorInXY * rotateAroundY;
+			// Move randVectorInXYRotated in localHitMatrix
+			CRTVector diffReflRayDir = randVectorInXYRotated * localHitMatrix;
+			// Constrict the diffuse reflection ray
+			CRTRay diffuseReflectionRay(bestIntersectionPoint.p + (shadeNormal * REFLECTION_BIAS),
+				diffReflRayDir,
+				ray.pathDepth + 1,
+				RayType::reflective);
+			diffuseReflectionsColor += intersectScene(diffuseReflectionRay);
 		}
 	}
+
+	finalColor += diffuseReflectionsColor;
+	finalColor = finalColor / (MAX_DIFFUSE_REFLECTION_RAY_COUNTS + 1);
 	return finalColor;
 }
 

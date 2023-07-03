@@ -25,7 +25,7 @@ public:
 	const CRTScene& operator=(const CRTScene&) = delete;
 
 	const std::vector<CRTMesh>& getGeometryObjects() const;
-	const CRTCamera& getCamera() const;
+	CRTCamera& getCamera();
 	const CRTSettings& getSettings() const;
 	const std::vector<CRTLight>& getLights() const;
 	const std::vector<CRTMaterial>& getMaterials() const;
