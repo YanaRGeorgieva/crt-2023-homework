@@ -18,15 +18,13 @@ int main() {
 	bool fovCycle = false;
 	for (size_t degs = 0; degs < 360; degs++) {
 		// Turn axis 
-		if (degs > 45) {
-			std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-			CRTImage image = renderer.render();
-			std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-			image.writeToPPMFile(".\\dino\\" + name + std::to_string(degs));
-			std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-			const double durationInSeconds = duration.count() / 1'000'000.0;
-			printf("Rendering of %s took %lf seconds.\n", (name).c_str(), durationInSeconds);
-		}
+		std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+		CRTImage image = renderer.render();
+		std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+		image.writeToPPMFile(".\\dino\\" + name + std::to_string(degs));
+		std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+		const double durationInSeconds = duration.count() / 1'000'000.0;
+		printf("Rendering of %s took %lf seconds.\n", (name).c_str(), durationInSeconds);
 		camera.setFov(90.0f - fovy);
 		camera.turnAroundAxis(initialRotation, initialPosition, degs, Z_AXIS);
 		if (fovy < 60 && !fovCycle) {
